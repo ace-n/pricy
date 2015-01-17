@@ -1,0 +1,261 @@
+/* Includes */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 100;
+  src: url(roboto.ttf) format('truetype');
+}
+
+/* Entire popup */
+ul {
+	margin-top: 5px;
+	padding-left:20px;
+}
+
+a {
+	text-decoration: none;
+	color: #FF7400;
+}
+
+.info > ul > li > a {
+	position: relative;
+	left: -3px;
+}
+
+.headline {
+	color: #FFFFFF;
+}
+
+.headline > img {
+	width: 30px;
+	vertical-align: top;
+}
+
+.body {
+	font-family:'Roboto', Geneva, sans-serif;
+	margin: 0px;
+	padding-bottom: 5px;
+	overflow: visible;
+}
+
+.body > h1 {
+	background-color: #FF7400;
+	margin: 0px;
+	padding-right:10px;
+	padding-bottom: 10px;
+}
+
+.body > a {
+	color: #FF7400;
+	text-decoration: none;
+}
+
+/* Main menu */
+.menu-body {
+	width: 130px;
+}
+
+.menu-body > h1 {
+	padding-top: 10px;
+	text-align: center;
+	width: 100%;
+}
+
+.menu-btn {
+	cursor: pointer;
+	display: block;
+	font-size: 15px;
+	outline: none;
+	padding: 10px;
+}
+
+.menu-btn:active,
+.menu-btn:hover {
+	background-color: #FFCDA4;
+	color: #FFFFFF;
+}
+
+/* Info (non-main-menu) */
+.info {
+	font-size: 13px;
+	padding-left: 10px;
+	padding-right: 10px;
+	width: 250px;
+}
+
+.info-body > h1 {
+	display: inline-block;
+	padding-top: 5px;
+}
+
+.info-headline {
+	display: inline-block;
+	float: right;
+	padding-top: 6px;
+	padding-right: 55px;
+	text-align: center;
+	width: calc(250px - 100px);
+}
+
+.info > h2 {
+	margin-top: 10px;
+	margin-bottom: 3px;
+}
+
+.back {
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 30px;
+	padding-left: 10px;
+	padding-right: 5px;
+	text-decoration: none;
+	width: 40px;
+}
+
+.symbol-ctr > h4 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.symbol {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+/* - Symbol styling */
+.symbol > .fa-square-o,
+.symbol > .fa-plus-square-o {
+	padding-right: 2px;
+}
+
+.symbol > .fa-inbox,
+.symbol > .fa-gear {
+	padding-left: 1px;
+}
+
+.symbol > .fa-dollar {
+	padding-left: 3px;
+	padding-right: 1px
+}
+
+.symbol > .fa-key {
+	padding-left: 1px;
+}
+
+.symbol > .fa-headphones {
+	padding-left: 1px;
+}
+
+.symbol-headphones,
+.symbol-key {
+	position: relative;
+	left: -1px;
+}
+
+/* - Options menu specific */
+.cbxes-panel {
+	overflow: auto;
+}
+
+.cbxes-panel > div {
+	display: inline;
+	width: calc(250px / 2);
+}
+
+.cbxes-panel > div > span,
+.cbxes-block > span {
+	display: block;
+}
+
+.checkbox {
+	color: #FF7400;
+	cursor: pointer;
+	display: inline;
+}
+
+.checkbox.fa-square-o {
+	padding-right: 2px;
+}
+
+.cbxes-panel > .left {
+	float: left;
+}
+
+.cbxes-panel > .right {
+	float: right;
+}
+
+.radio {
+	color: #FF7400;
+	cursor: pointer;
+}
+
+.rbns > span {
+	padding-right: 10px;
+}
+
+.txts {
+	display: flex;
+}
+
+.txts > span {
+	padding-right: 8px;
+}
+
+.txts > .left {
+	float: left;
+} 
+
+.txts > .mid,
+.txts > .right {
+	float: right;
+}
+
+.numbox,
+.numbox > input {
+	cursor: not-allowed;
+}
+
+.numbox {
+	border: 1px solid #FF7400;
+	width: 74px;
+}
+.numbox > input {
+	border: none;
+	color: #FF7400;
+	font-family:'Roboto', Geneva, sans-serif;
+	outline: none;
+	position: relative;
+	top: -4px;
+	left: 4px;
+	width: 44px;
+}
+
+.numbox-btn {
+	color: #FF7400;
+	cursor: pointer;
+	font-size: 20px;
+	position: relative;
+	top: -1px;
+}
+
+.numbox-btn.disabled {
+	cursor: not-allowed;
+	color: #7F7F7F;
+}
+
+/* .checkbox,
+.radio {
+	border: 1px solid #FF7400;
+	display: inline;
+	font-size: 8px;
+	padding-left: 10px;
+	padding-top: 2px;
+}
+
+.checkbox.checked {
+	background-size: 10px 10px;
+	background-repeat: no-repeat;
+	background-image: url(check.png);
+	background-position: left 1px top 1px;
+} */

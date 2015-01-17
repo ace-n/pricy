@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+
+  "name": "Pricy",
+  "author": "me",
+  "description": "Displays prices from TF2 item exchanges on top trading sites",
+  "version": "0.1",
+
+  "permissions": [
+    "storage",
+    "http://*.tf2wh.com/priceguide",
+    "http://*.trade.tf/spreadsheet"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["http://bazaar.tf/*"],
+      "js": ["kvStore.js", "misc.js", "constants.js", "optionsIO.js", "query.js"]
+    },
+
+    {
+      "matches": ["http://bazaar.tf/*"],
+      "js": ["listeners/bazaartf.js"]
+    }
+  ],
+
+  "offline_enabled": false,
+
+  "browser_action": {
+    "default_icon": "icon copy.png",
+    "default_popup": "popup/main.html"
+  },
+
+  "web_accessible_resources": [
+    "icons/*.ico"
+  ]
+}
