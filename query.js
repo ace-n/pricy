@@ -6,28 +6,28 @@ var PricyQuery = {
 		// Convert strange types (eg. "Face-melting") to "Strange"
 		var types = [
 			// Original strange types
-			"Unremarkable","Scarcely Lethal","Mildly Menacing","Somewhat Threatening",
-			"Uncharitable","Notably Dangerous","Sufficiently Lethal","Truly Feared",
-			"Spectacularly Lethal","Gore-Spattered","Wicked Nasty","Positively Inhumane",
-			"Totally Ordinary","Face-Melting","Rage-Inducing","Server-Clearing","Epic",
-			"Legendary","Australian","Hale's Own",
+			"Unremarkable ","Scarcely Lethal ","Mildly Menacing ","Somewhat Threatening ",
+			"Uncharitable ","Notably Dangerous ","Sufficiently Lethal ","Truly Feared ",
+			"Spectacularly Lethal ","Gore-Spattered ","Wicked Nasty ","Positively Inhumane ",
+			"Totally Ordinary ","Face-Melting ","Rage-Inducing ","Server-Clearing ","Epic ",
+			"Legendary ","Australian ","Hale's Own ",
 
 			// Additional strange types
-			"Scarcely Shocking","Mildly Magnetizing","Somewhat Inducting","Unfortunate",
-			"Notably Deleterious","Sufficiently Ruinous","Truly Conducting","Spectacularly Pseudoful",
-			"Ion-Spattered","Wickedly Dynamizing","Positively Plasmatic","Circuit-Melting",
-			"Nullity-Inducing","Mann Co. Select",
+			"Scarcely Shocking ","Mildly Magnetizing ","Somewhat Inducting ","Unfortunate ",
+			"Notably Deleterious ","Sufficiently Ruinous ","Truly Conducting ","Spectacularly Pseudoful ",
+			"Ion-Spattered ","Wickedly Dynamizing ","Positively Plasmatic ","Circuit-Melting ",
+			"Nullity-Inducing ","Mann Co. Select ",
 
 			// More strange types
-			"Garish"];
+			"Garish ", "Fancy Shmancy "];
 		var i;
-		for (i=0; i<20; i++) {
-			name = name.replace(new RegExp("^" + types[i] + " "), "Strange ");
+		for (i=0; i<types.length; i++) {
+			name = Misc.replaceStart(name, types[i], "Strange ");
 		}
 
 		// Remove 'the'
 		if (removeThe) {
-			name = name.replace(new RegExp("^The "),"");
+			name = Misc.replaceStart(name, "The ", "");
 		}
 
 		// Return
@@ -75,109 +75,70 @@ var PricyQuery = {
 		// Normalize name
 		name = PricyQuery.normalizeName(name, true);
 
-		// Check against hardcoded items
-		switch (name) {
-			case "Scrap Metal":
-				return {"l": 0.11, "h": 0.11, "u":"Refined Metal", "uh": "gear"};
-			case "Reclaimed Metal":
-				return {"l": 0.33, "h": 0.33, "u":"Refined Metal", "uh": "gear"};
-			case "Refined Metal":
-				return {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"};
-			// Items that are (incorrectly) listed as both craftable and non-craftable on Trade.tf
-			case "Tour of Duty Ticket":
-			case "Squad Surplus Voucher":
-				if (craftable) {
-					return null;
-				}
-			default:
-				break;
-		}
-
-		// Determine item type
-		var t,i;
-		var ns = name.slice(0,8) || "";
-		var type = 'n'; // Unique
-		if (asPart) {
-			type = 'p'; // Part ('bonus when equipped')
-		}
-		else if (ns == "Strange " && name.indexOf("Part:") !== 0) {
-			/* Don't replace the "Strange" in "Strange Part" */
-		}
-		else if (craftable) {
-			types = ["Strange ", "Vintage ", "Genuine ", "Haunted "]; // All of length 8
-			for (i=0; i<4; i++) {
-				t = types[i];
-				if (ns == t) {
-					name = name.slice(8);
-					type = t.charAt(0).toLowerCase();
-					break;
-				}
-			}
-		} else {
-			type = 'u'; // Uncraftable
+		// Throw "Querying..." error if a query is currently in progress
+		if (kvStore.kvGet("trd-querying") === "1") {
+			throw "Querying Trade.tf..."
 		}
 
 		// Re-query Trade.tf iff. current cache is expired
 		exp = kvStore.kvGet("trd-exp");
-		lock = kvStore.kvGet("trd-querying") === "1";
-		if (!exp || exp < Date.now() || lock) {
+		if (!exp || exp < Date.now()) {
 			PricyQuery.updateTradeTF();
 			throw "Querying Trade.tf..."
 		}
 
-		// Grab from cache if JSON and type are valid
-		var json = kvStore.kvGet("trd_" + name);
-		if (!json) { return null; }
-		var price;
-		try {
-			price = json[type];
-			if (!price) {
-				return null;
-			}
-			else if (price === "?") {
-				return "?";
-			}
-		}
-		catch (ex) {
-			return null;
-		}
+		// Fetch data from cache
+		var result = kvStore.kvGet("trd_" + (asPart ? "AddonPart " : "") + (craftable ? "" : "Uncraftable ") + name);
+		if (result) {
+			return result;
+		} else {
 
-		// Convert raw price into parseable JSON
-		json = {};
-		var priceBounds = price.match(new RegExp("(\\d|\\.)+", "gm"));
-		json["l"] = parseFloat(priceBounds[0], 10);
-		json["h"] = priceBounds.length == 1 ? json["l"] : parseFloat(priceBounds[1], 10);
-
-		var priceAbbr = price.match(new RegExp("\\w+$"))[0];
-		switch (priceAbbr) {
-			case "ref":
-				json["u"] = "Refined Metal";
-				json["uh"] = "gear"
-				break;
-			case "key":
-			case "keys":
-				json["u"] = "Mann Co. Supply Crate Key";
-				json["uh"] = "key"
-				break;
-			case "bud":
-			case "buds":
-				json["u"] = "Earbuds";
-				json["uh"] = "headphones"
-				break;
-			default:
-				throw "Invalid priceAbbr";
 		}
-
-		// Done!
-		return json;
 	},
 
 	// Actually query trade.tf itself
-	nullWrapperTradeTF: function (json, key, elem) {
+	updateItemTradeTF: function (name, quality, elem, childIdx) {
+		var obj = {};
 		if (elem) {
-			var c0 = elem.children[0];
-			if (c0) {
-				json[key] = c0.innerText.trim() || "?"; // "?" marks the price as 'existing'
+			var child = elem.children[childIdx];
+			if (child) {
+
+				var price = child.innerText.trim(); // "?" marks the price as 'existing'
+				var json = {};
+				if (price) {
+
+					// Convert raw price into parseable JSON
+					var priceBounds = price.match(new RegExp("(\\d|\\.)+", "gm"));
+					json["l"] = parseFloat(priceBounds[0], 10);
+					json["h"] = priceBounds.length == 1 ? json["l"] : parseFloat(priceBounds[1], 10);
+
+					var priceAbbr = price.match(new RegExp("\\w+$"))[0];
+					switch (priceAbbr) {
+						case "ref":
+							json["u"] = "Refined Metal";
+							json["uh"] = "gear"
+							break;
+						case "key":
+						case "keys":
+							json["u"] = "Mann Co. Supply Crate Key";
+							json["uh"] = "key"
+							break;
+						case "bud":
+						case "buds":
+							json["u"] = "Earbuds";
+							json["uh"] = "headphones"
+							break;
+						default:
+							throw "Invalid priceAbbr";
+					}
+				}
+				else {
+					json["l"] = "?";
+					json["h"] = "?";
+				}
+
+				// Store JSON in memory
+				kvStore.kvSet("trd_" + (quality ? quality + " " : "") + name, json);
 			}
 		}
 	},
@@ -190,34 +151,42 @@ var PricyQuery = {
 			return ss.getElementsByTagName("tr");
 		};
 		callback = function(rows) { 
-			var i;
+
+			// Update cache with query results
+			var i, name, bwe_idx, json, cols;
 			for (i=0; i<rows.length; i++) {
 
 				// Get name
-				var name = rows[i].getElementsByTagName("th")[0].innerText.trim();
+				name = rows[i].getElementsByTagName("th")[0].innerText.trim();
 
 				// Check for "bonus when equipped"
-				var bwe_idx = name.indexOf("\n");
+				bwe_idx = name.indexOf("\n");
 				if (bwe_idx != -1) {
 					name = name.slice(0, bwe_idx);
 				}
 
-				// Get values
-				var json = {};
-				var cols = rows[i].getElementsByTagName("td");
-				PricyQuery.nullWrapperTradeTF(json, "n", cols[1]);
+				// Update cached values
+				json = {};
+				cols = rows[i].getElementsByTagName("td");
+				name = PricyQuery.normalizeName(name, true);
+				PricyQuery.updateItemTradeTF(name, "", cols[1], 0);
 				if (bwe_idx != -1) {
-					try { json["p"] = cols[1].children[2].innerText.trim(); } catch(e) {}
+					PricyQuery.updateItemTradeTF(name, "AddonPart", cols[1], 2);
 				}
-				PricyQuery.nullWrapperTradeTF(json, "u", cols[2]);
-				PricyQuery.nullWrapperTradeTF(json, "v", cols[3]);
-				PricyQuery.nullWrapperTradeTF(json, "g", cols[4]);
-				PricyQuery.nullWrapperTradeTF(json, "s", cols[5]);
-				PricyQuery.nullWrapperTradeTF(json, "h", cols[6]);
-
-				// Log object in cache
-				kvStore.kvSet("trd_" + PricyQuery.normalizeName(name, true), json);
+				PricyQuery.updateItemTradeTF(name, "Uncraftable", cols[2], 0);
+				PricyQuery.updateItemTradeTF(name, "Vintage", cols[3], 0);
+				PricyQuery.updateItemTradeTF(name, "Genuine", cols[4], 0);
+				PricyQuery.updateItemTradeTF(name, "Strange", cols[5], 0);
+				PricyQuery.updateItemTradeTF(name, "Haunted", cols[6], 0);
 			}
+
+			// Reset hardcoded items
+			kvStore.kvSet("trd_Scrap Metal", {"l": 0.11, "h": 0.11, "u":"Refined Metal", "uh": "gear"});
+			kvStore.kvSet("trd_Reclaimed Metal", {"l": 0.33, "h": 0.33, "u":"Refined Metal", "uh": "gear"});
+			kvStore.kvSet("trd_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"});
+			// Items that are (incorrectly) listed as both craftable and non-craftable on Trade.tf
+			kvStore.kvSet("trd_Tour of Duty Ticket", null);
+			kvStore.kvSet("trd_Squad Surplus Voucher", null);
 
 			// Save kvStore (since a lot of things have just been updated)
 			kvStore.kvSet("trd-querying", "0");
@@ -254,10 +223,14 @@ var PricyQuery = {
 			}
 		}
 
+		// Throw "Querying..." error if a query is currently in progress
+		if (kvStore.kvGet("trd-querying") === "1") {
+			throw "Querying Trade.tf..."
+		}
+
 		// Re-query TF2WH iff. current cache is expired
 		exp = kvStore.kvGet("wh-exp");
-		lock = kvStore.kvGet("wh-querying") === "1";
-		if (!exp || exp < Date.now() || lock) {
+		if (!exp || exp < Date.now()) {
 			PricyQuery.updateTF2WH();
 			throw "Querying TF2WH..."
 		}

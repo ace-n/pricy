@@ -9,7 +9,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 	
 	// Get data
 	var name = attrs["data-name"].value;
-	var customNamed = (name.indexOf("&quot;") == 0);
+	var customNamed = name.slice(0,6) === "&quot;";
 	var craftable = true;
 	if (customNamed) {
 		name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
@@ -24,20 +24,15 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 	
 	// Add details to item
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
-	var buyPrice, sellMatch, sellPrice, ultimateToggle; // Other loop vars
+	var buyPrice, sellPrice, toggle; // Other loop vars
 	if (newJson) {
 		try {
 			//newJson = JSON.parse(newJson);
 
 			// Compute prices
-			ultimateToggle = Options.PRICES_SHOW_ULTIMATE() ? "-u" : "";
-			if (Options.PRICE_DISPLAY_MODE() == 1) {
-				buyPrice = newJson["bc" + ultimateToggle];
-				sellPrice = newJson["sc" + ultimateToggle];
-			} else {
-				buyPrice = newJson["bp" + ultimateToggle];
-				sellPrice = newJson["sp" + ultimateToggle];
-			}
+			toggle = (Options.PRICE_DISPLAY_MODE() == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE() ? "-u" : "");
+			buyPrice = newJson["b" + toggle];
+			sellPrice = newJson["s" + toggle];
 
 			// Add details to HTML
 			asi = 
@@ -81,14 +76,14 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 	var parts = [];
 	if (notes) {
 		var noteLines = notes.value.split(/<.+?>/g);
-		var i;
+		var i, line, pName;
 		var dp = new DOMParser();
 
 		for (i=0; i<noteLines.length; i++) {
 
 			// Get line
-			var line = noteLines[i];
-			if ((!line) || line.length < 2) {
+			line = noteLines[i];
+			if (!line || line.length < 2) {
 				continue; // Skip null lines
 			}
 
@@ -98,7 +93,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 				craftable = false;
 			}
 			// - Paints
-			else if (line.indexOf("Painted: ") === 0) {
+			else if (line.slice(0,9) ==="Painted: ") {
 				parts.push(line.slice(9));
 			}
 			// - Skip first line (if we're dealing with strange attributes),
@@ -106,7 +101,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			else if (i === 0) {}
 			// - Strange [Cosmetic] Parts
 			else {
-				var pName = line.replace(new RegExp(/:.+$/), "");
+				pName = line.replace(new RegExp(/:.+$/), "");
 				if (PricyQuery.queryTradeTF("Strange Cosmetic Part: " + pName, true, false)) {
 					pName = "Strange Cosmetic Part: " + pName;
 				} else {
@@ -125,12 +120,11 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 	if (json && json !== "?") {
 		try {
 
-			// Parse JSON
-			//json = JSON.parse(json);
-			loAlone = json["l"];
-			hiAlone = json["h"];
-			loParts = loAlone;
-			hiParts = hiAlone;
+			// Init variables
+			var loAlone = json["l"];
+			var hiAlone = json["h"];
+			var loParts = loAlone;
+			var hiParts = hiAlone;
 
 			// Calculate lo/hi with parts prices (if applicable)
 			showParts = false;
@@ -144,7 +138,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 							hiCur = pJson["h"];
 
 							// Make sure part and original item are in terms of the same thing
-							if (json["u"] != pJson["u"]) {
+							if (json["uh"] != pJson["uh"]) {
 
 								// Common vars
 								if (!keyRefRatio) {
@@ -154,7 +148,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 								// Assuming parts are traded in terms of keys and ref exclusively
 								// (since not doing so increases complexity significantly)
-								if (pJson["u"] === "Mann Co. Supply Crate Key") {
+								if (pJson["uh"] === "key") {
 									loCur *= keyRefRatio;
 									hiCur *= keyRefRatio;
 								} else {
