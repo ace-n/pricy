@@ -14,10 +14,12 @@ var kvStore = {
 					kvStore.kvReady = true;
 
 					// Execute user-defined function
-					setTimeout(callback(), 10);
+					if (callback) {
+						setTimeout(callback(), 10);
+					}
 				}
 			);
-		} else {
+		} else if(callback) {
 			callback();
 		}
 	},

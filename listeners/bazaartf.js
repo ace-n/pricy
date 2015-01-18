@@ -24,13 +24,13 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 	
 	// Add details to item
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
+	var buyPrice, sellMatch, sellPrice, ultimateToggle; // Other loop vars
 	if (newJson) {
 		try {
 			//newJson = JSON.parse(newJson);
-			var buyPrice, sellMatch, sellPrice;
 
 			// Compute prices
-			var ultimateToggle = Options.PRICES_SHOW_ULTIMATE() ? "-u" : "";
+			ultimateToggle = Options.PRICES_SHOW_ULTIMATE() ? "-u" : "";
 			if (Options.PRICE_DISPLAY_MODE() == 1) {
 				buyPrice = newJson["bc" + ultimateToggle];
 				sellPrice = newJson["sc" + ultimateToggle];
@@ -120,6 +120,8 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 	// Query Trade.tf (and throw an exception if query fails)
 	var json = PricyQuery.queryTradeTF(name, craftable, false);
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
+	var showParts, i, pJson, loCur, hiCur, keyRefRatio, unitRatio; // Other loop vars
+	keyRefRatio = null;
 	if (json && json !== "?") {
 		try {
 
@@ -131,21 +133,24 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			hiParts = hiAlone;
 
 			// Calculate lo/hi with parts prices (if applicable)
+			showParts = false;
 			if (Options.PRICES_SHOW_WITH_PARTS() && parts.length > 0) {
-				for (var i=0; i<parts.length; i++) {
+				for (i=0; i<parts.length; i++) {
 					try {
-						var pJson = PricyQuery.queryTradeTF(parts[i], true, true);
+						pJson = PricyQuery.queryTradeTF(parts[i], true, true);
 						if (pJson) {
 							//pJson = JSON.parse(pJson);
-							var loCur = pJson["l"];
-							var hiCur = pJson["h"];
+							loCur = pJson["l"];
+							hiCur = pJson["h"];
 
 							// Make sure part and original item are in terms of the same thing
 							if (json["u"] != pJson["u"]) {
 
 								// Common vars
-								var keyRefRatio = PricyQuery.queryTradeTF("Mann Co. Supply Crate Key", true, false);
-								keyRefRatio = (keyRefRatio["l"] + keyRefRatio["h"])/2;
+								if (!keyRefRatio) {
+									keyRefRatio = PricyQuery.queryTradeTF("Mann Co. Supply Crate Key", true, false);
+									keyRefRatio = (keyRefRatio["l"] + keyRefRatio["h"])/2;
+								}
 
 								// Assuming parts are traded in terms of keys and ref exclusively
 								// (since not doing so increases complexity significantly)
@@ -159,6 +164,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 							}
 
 							// Accumulate
+							showParts = true;
 							loParts += loCur;
 							hiParts += hiCur;
 						}
@@ -171,7 +177,6 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 			// Convert lo/hi prices to appropriate units
 			if (Options.PRICE_DISPLAY_MODE() === 0) {
-				var unitRatio;
 				try {
 					unitRatio = PricyQuery.queryTF2WH(json["u"], true)["bp"];
 				} catch (ex) {
@@ -190,18 +195,19 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			}
 
 			// Add details to HTML
+			faIcon = (Options.PRICE_DISPLAY_MODE() === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
 			asi = 
 				"<p>" +
 					"<img style='width: 25px' src='" + tradetf_favicon + "'/>" +
 					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
-					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) + " " + 
-					(Options.PRICE_DISPLAY_MODE() === 0 ? "" : "<span class='fa fa-" + json["uh"] + "'/>");
-			if (loParts != loAlone || hiParts != hiAlone) {
+					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) +
+					faIcon;
+			if (showParts) {
 				asi += 
 					",&nbsp;&nbsp;" +
 						"<span class='fa fa-plus-square-o'/>&nbsp;&nbsp;" +
-						loParts + (loParts == hiParts ? "" : " - " + hiParts) + " " + 
-						(Options.PRICE_DISPLAY_MODE() === 0 ? "" : "<span class='fa fa-" + json["uh"] + "'/>");
+						loParts + (loParts == hiParts ? "" : " - " + hiParts) + 
+						faIcon;
 			}
 			asi += "</p>"
 
@@ -334,7 +340,6 @@ var MutationInterop = function () {
 
 // Run JS
 var listen = function() {
-	console.log("callback!")
 	if (Options.PRICES_SHOW_ON_BAZAAR()) {
 		var t = Date.now();
 
@@ -350,5 +355,13 @@ kvStore.kvInit(listen);
 
 /* Save kvStore on window change */
 window.onbeforeunload = function () {
+
+	/* These values are not shared between pages, since they
+	 only pull copies of this info during the loading phase */
+	kvStore.kvSet("wh-querying", "0");
+	kvStore.kvSet("trd-querying", "0");
+	kvStore.kvSet("bptf-querying", "0");
+
+	// Save
 	kvStore.kvSave();
 };

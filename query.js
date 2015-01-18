@@ -95,19 +95,20 @@ var PricyQuery = {
 
 		// Determine item type
 		var t,i;
+		var ns = name.slice(0,8) || "";
 		var type = 'n'; // Unique
 		if (asPart) {
 			type = 'p'; // Part ('bonus when equipped')
 		}
-		else if (name.match(new RegExp("^Strange .?Part:"))) {
+		else if (ns == "Strange " && name.indexOf("Part:") !== 0) {
 			/* Don't replace the "Strange" in "Strange Part" */
 		}
 		else if (craftable) {
-			types = ["Strange ", "Vintage ", "Genuine ", "Haunted "];
-			for (i=0; i<types.length; i++) {
+			types = ["Strange ", "Vintage ", "Genuine ", "Haunted "]; // All of length 8
+			for (i=0; i<4; i++) {
 				t = types[i];
-				if (name.indexOf(t) == 0) {
-					name = name.slice(t.length);
+				if (ns == t) {
+					name = name.slice(8);
 					type = t.charAt(0).toLowerCase();
 					break;
 				}
@@ -142,41 +143,45 @@ var PricyQuery = {
 		}
 
 		// Convert raw price into parseable JSON
+		json = {};
 		var priceBounds = price.match(new RegExp("(\\d|\\.)+", "gm"));
-		var priceLo = priceBounds[0];
-		var priceHi = priceBounds[priceBounds.length - 1];
+		json["l"] = parseFloat(priceBounds[0], 10);
+		json["h"] = priceBounds.length == 1 ? json["l"] : parseFloat(priceBounds[1], 10);
 
 		var priceAbbr = price.match(new RegExp("\\w+$"))[0];
-		var priceUnit;
-		var priceUnitHTML;
-
 		switch (priceAbbr) {
 			case "ref":
-				priceUnit = "Refined Metal";
-				priceUnitHTML = "gear"
+				json["u"] = "Refined Metal";
+				json["uh"] = "gear"
 				break;
 			case "key":
 			case "keys":
-				priceUnit = "Mann Co. Supply Crate Key";
-				priceUnitHTML = "key"
+				json["u"] = "Mann Co. Supply Crate Key";
+				json["uh"] = "key"
 				break;
 			case "bud":
 			case "buds":
-				priceUnit = "Earbuds";
-				priceUnitHTML = "headphones"
+				json["u"] = "Earbuds";
+				json["uh"] = "headphones"
 				break;
 			default:
 				throw "Invalid priceAbbr";
 		}
-
-		//json = '{"l":' + priceLo + ',"h":' + priceHi + ',"u":"' + priceUnit + '","uh":"' + priceUnitHTML + '"}';
-		json = {"l": priceLo, "h": priceHi, "u": priceUnit, "uh": priceUnitHTML};
 
 		// Done!
 		return json;
 	},
 
 	// Actually query trade.tf itself
+	nullWrapperTradeTF: function (json, key, elem) {
+		if (elem) {
+			var c0 = elem.children[0];
+			if (c0) {
+				json[key] = c0.innerText.trim() || "?"; // "?" marks the price as 'existing'
+			}
+		}
+	},
+
 	updateTradeTF: function () {
 		rowFunc = function (response) {
 			var dp = new DOMParser();
@@ -185,8 +190,7 @@ var PricyQuery = {
 			return ss.getElementsByTagName("tr");
 		};
 		callback = function(rows) { 
-			var i, j;
-			var c_unique, c_part, c_uncraft, c_vintage, c_genuine, c_strange, c_haunted;
+			var i;
 			for (i=0; i<rows.length; i++) {
 
 				// Get name
@@ -199,23 +203,19 @@ var PricyQuery = {
 				}
 
 				// Get values
-				c_unique=c_part=c_uncraft=c_vintage=c_genuine=c_strange=c_haunted="";
+				var json = {};
 				var cols = rows[i].getElementsByTagName("td");
-				try { c_unique  = cols[1].children[0].innerText.trim(); } catch(e) {}
+				PricyQuery.nullWrapperTradeTF(json, "n", cols[1]);
 				if (bwe_idx != -1) {
-					try { c_part    = cols[1].children[2].innerText.trim(); } catch(e) {}
+					try { json["p"] = cols[1].children[2].innerText.trim(); } catch(e) {}
 				}
-				try { c_uncraft = cols[2].children[0].innerText.trim() || "?"; } catch(e) {}
-				try { c_vintage = cols[3].children[0].innerText.trim() || "?"; } catch(e) {}
-				try { c_genuine = cols[4].children[0].innerText.trim() || "?"; } catch(e) {}
-				try { c_strange = cols[5].children[0].innerText.trim() || "?"; } catch(e) {}
-				try { c_haunted = cols[6].children[0].innerText.trim() || "?"; } catch(e) {}
+				PricyQuery.nullWrapperTradeTF(json, "u", cols[2]);
+				PricyQuery.nullWrapperTradeTF(json, "v", cols[3]);
+				PricyQuery.nullWrapperTradeTF(json, "g", cols[4]);
+				PricyQuery.nullWrapperTradeTF(json, "s", cols[5]);
+				PricyQuery.nullWrapperTradeTF(json, "h", cols[6]);
 
-				// Convert values to JSON
-				//var json = '{"n":"' + c_unique + '","p":"' + c_part + '","u":"' + c_uncraft + '","v":"' + c_vintage + '","g":"' + c_genuine + '","s":"' + c_strange + '","h":"' + c_haunted + '"}'; 
-				json = {"n": c_unique, "p": c_part, "u": c_uncraft, "v": c_vintage, "g": c_genuine, "s": c_strange, "h": c_haunted}; 
-
-				// Log JSON in cache
+				// Log object in cache
 				kvStore.kvSet("trd_" + PricyQuery.normalizeName(name, true), json);
 			}
 
@@ -321,7 +321,6 @@ var PricyQuery = {
 
 				/**************** Build + store JSON ****************/
 				// Build JSON
-				//i_toJson = '{"bp":' + i_buyPrice + ',"bc":"' + i_buyConv + '","sp":' + i_sellPrice + ',"sc":"' + i_sellConv + '","sp-u":' + i_sellPrice_u + ',"sc-u":"' + i_sellConv_u + '","h":' + i_stock_cur + ',"m":' + i_stock_max + '}';
 				i_toJson = {"bp": i_buyPrice, "bc": i_buyConv, "sp": i_sellPrice, "sc": i_sellConv, "sp-u": i_sellPrice_u, "sc-u": i_sellConv_u, "h": i_stock_cur, "m": i_stock_max};
 
 				// Cache JSON
@@ -340,8 +339,4 @@ var PricyQuery = {
 };
 
 // Run JS (TODO get sync working correctly)
-kvStore.kvInit(function() {
-	kvStore.kvSet("wh-querying", "0");
-	kvStore.kvSet("trd-querying", "0");
-	kvStore.kvSet("bptf-querying", "0");
-});
+kvStore.kvInit(null);
