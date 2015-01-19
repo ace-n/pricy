@@ -9,18 +9,16 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 	
 	// Get data
 	var name = attrs["data-name"].value;
-	var customNamed = name.slice(0,6) === "&quot;";
+	var customNamed = Misc.startsWith(name, "&quot;");
 	var craftable = true;
-	if (customNamed) {
+	if (customNamed)
 		name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-	}
 	var notes = attrs["data-notes"];
-	if (notes) {
+	if (notes)
 		craftable = (notes.value.indexOf("(Not Craftable)") === -1);
-	}
 
 	// Query TF2WH (and throw an exception if query fails)
-	var newJson = PricyQuery.queryTF2WH(name, craftable);
+	var newJson = PricyQuery.queryTF2WH(store, name, craftable);
 	
 	// Add details to item
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
@@ -50,7 +48,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 		catch (ex) {
 			return "<p>Error: " + ex + "</p>";
 		}
-	} else {
+	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES()) {
 		asi = 
 			"<p style='color:red'>" +
 				"<img style='width: 25px' src='" + wh_favicon + "' />&nbsp;&nbsp;" +
@@ -67,54 +65,53 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 	var name = attrs["data-name"].value;
 	var customNamed = name.indexOf("&quot;") == 0;
 	var craftable = true;
-	if (customNamed) {
+	if (customNamed)
 		name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-	}
 	
 	// Get more data + additional parts (strange addons/paints)
 	var notes = attrs["data-notes"];
 	var parts = [];
 	if (notes) {
-		var noteLines = notes.value.split(/<.+?>/g);
+		var noteLines = (notes.value.slice(1, -1)).split(/<.+?>/g);
 		var i, line, pName;
 		var dp = new DOMParser();
+		var isFirstLine = true;
 
 		for (i=0; i<noteLines.length; i++) {
 
 			// Get line
 			line = noteLines[i];
-			console.log(line)
-			if (!line || line.length < 2) {
+			if (!line || line.length < 2)
 				continue; // Skip null lines
-			}
 
 			// Record line info
 			// - Craftable status
-			if (line === "(Not Craftable)") {
+			if (line === "(Not Craftable)")
 				craftable = false;
-			}
 			// - Paints
-			else if (line.slice(0,9) ==="Painted: ") {
+			else if (Misc.startsWith(line, "Painted: "))
 				parts.push(line.slice(9));
-			}
 			// - Skip first line (if we're dealing with strange attributes),
 			//   since it's not an additional part
-			else if (i === 0) {}
+			else if (isFirstLine) { isFirstLine = false; }
+			// - Skip "Crafted/Gifted by" lines
+			else if (Misc.startsWith(line, "Crafted by ") || Misc.startsWith(line, "Gifted on ")) {}
 			// - Strange [Cosmetic] Parts
 			else {
 				pName = line.replace(new RegExp(/:.+$/), "");
-				if (PricyQuery.queryTradeTF("Strange Cosmetic Part: " + pName, true, false)) {
+				if (PricyQuery.queryTradeTF(store, "Strange Cosmetic Part: " + pName, true, false)) {
 					pName = "Strange Cosmetic Part: " + pName;
 				} else {
 					pName = "Strange Part: " + pName;
 				}
 				parts.push(pName);
 			}
+			isFirstLine = false;
 		}
 	}
 
 	// Query Trade.tf (and throw an exception if query fails)
-	var json = PricyQuery.queryTradeTF(name, craftable, false);
+	var json = PricyQuery.queryTradeTF(store, name, craftable, false);
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
 	var showParts, i, pJson, loCur, hiCur, keyRefRatio, unitRatio; // Other loop vars
 	keyRefRatio = null;
@@ -131,7 +128,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			showParts = false;
 			if (Options.PRICES_SHOW_WITH_PARTS() && parts.length > 0) {
 				for (i=0; i<parts.length; i++) {
-					pJson = PricyQuery.queryTradeTF(parts[i], true, true);
+					pJson = PricyQuery.queryTradeTF(store, parts[i], true, true);
 					if (pJson) {
 						//pJson = JSON.parse(pJson);
 						loCur = pJson["l"];
@@ -142,7 +139,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 							// Common vars
 							if (!keyRefRatio) {
-								keyRefRatio = PricyQuery.queryTradeTF("Mann Co. Supply Crate Key", true, false);
+								keyRefRatio = PricyQuery.queryTradeTF(store, "Mann Co. Supply Crate Key", true, false);
 								keyRefRatio = (keyRefRatio["l"] + keyRefRatio["h"])/2;
 							}
 
@@ -168,7 +165,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			// Convert lo/hi prices to appropriate units
 			if (Options.PRICE_DISPLAY_MODE() === 0) {
 				try {
-					unitRatio = PricyQuery.queryTF2WH(json["u"], true)["bp"];
+					unitRatio = PricyQuery.queryTF2WH(store, json["u"], true)["bp"];
 				} catch (ex) {
 					"<p>" +
 						"<img style='width: 25px' src='" + tradetf_favicon + "' /> " +
@@ -208,15 +205,14 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			console.log(ex);
 			return "<p>Error: " + ex + "</p>";
 		}
-	} else {
+	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES()) {
 
 		// Create error message
 		var errorMsg = "No match found";
-		if (customNamed) {
+		if (customNamed)
 			errorMsg = "Custom names not yet supported";
-		} else if (json && json["l"] == "?") {
+		else if (json && json["l"] == "?")
 			errorMsg = "Price is uncertain";
-		}
 
 		// Append to ASI
 		asi = 
@@ -233,13 +229,15 @@ var INTERNAL_addItem = function (item) {
 
 	// Get values
 	attrs = item.attributes;
+	if (!attrs)
+		return null;
 
 	// Skip actual non-TF2 items
-	if (!attrs["data-game"] || attrs["data-game"].value != 440)
+	else if (!attrs["data-game"] || attrs["data-game"].value != 440)
 		return null;
 
 	// Skip internal items (e.g. "Offers")
-	if (!attrs["data-defindex"] || attrs["data-defindex"].value < 0)
+	else if (!attrs["data-defindex"] || attrs["data-defindex"].value < 0)
 		return null;
 
 	// Add additional data
@@ -247,34 +245,35 @@ var INTERNAL_addItem = function (item) {
 
 		// Get data
 		var newDetails = attrs['data-details'].value;
-		if (origDetails) {
+		if (origDetails)
 			newDetails = origDetails;
-		} else if (!newDetails) {
+		else if (!newDetails)
 			newDetails = "";
-		}
 
 		// Query TF2WH
 		var tryingLater = false;
 		if (Options.PRICES_SHOW_TF2WH()) {
-			try {
-				newDetails += INTERNAL_addItemTF2WH(item, attrs)
-			} catch (ex) {
+			//try {
+				newDetails += INTERNAL_addItemTF2WH(item, attrs);
+			//}
+			/* catch (ex) {
 				console.log(ex);
 				tryingLater = true;
 				setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
 				newDetails +=
 					"<p>" +
 						"<img style='width: 25px' src='" + wh_favicon + "' /> " +
-						"Updating data..." +
+						ex +
 					"</p>";
-			}
+			} */
 		}
 
 		// Query Trade.tf
 		if (Options.PRICES_SHOW_TRADETF()) {
 			try {
 				newDetails += INTERNAL_addItemTradeTF(item, attrs)
-			} catch (ex) {
+			}
+			catch (ex) {
 				if (!tryingLater) {
 					setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
 				}
@@ -282,7 +281,7 @@ var INTERNAL_addItem = function (item) {
 				newDetails +=
 					"<p>" +
 						"<img style='width: 25px' src='" + tradetf_favicon + "' /> " +
-						"Updating data..." +
+						ex +
 					"</p>";
 			}
 		}
@@ -299,12 +298,12 @@ var InitialInterop = function () {
 	var items = document.getElementsByClassName("item");
 	var item, attrs, i;
 	for (i=0; i<items.length; i++) {
-		try {
+		//try {
 			INTERNAL_addItem(items[i]);
-		}
-		catch (ex) {
-			console.log(ex);
-		}
+		//}
+		//catch (ex) {
+		//	console.log(ex);
+		//}
 	}
 };
 
@@ -351,17 +350,5 @@ var listen = function() {
 };
 
 /* Init kvStore */
-kvStore.kvInit(listen);
-
-/* Save kvStore on window change */
-window.onbeforeunload = function () {
-
-	/* These values are not shared between pages, since they
-	 only pull copies of this info during the loading phase */
-	kvStore.kvSet("wh-querying", "0");
-	kvStore.kvSet("trd-querying", "0");
-	kvStore.kvSet("bptf-querying", "0");
-
-	// Save
-	kvStore.kvSave();
-};
+var store = new kvStore("pricyItems", null);
+console.log(store);

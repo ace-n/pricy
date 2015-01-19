@@ -1,45 +1,43 @@
 /* An in-memory-based, chrome.storage-backed KV storage solution */
-var kvStore = {
+/* Since Javascript doesn't offer any good mutex solutions, we enforce the mutex
+   condition by making sure each kvStore instance has only one possible writer */
+function kvStore(name, initCallback) {
 
 	// In-memory KV store (backed by chrome.storage)
-	kvStore: {},
-	kvReady: false,
+	this.kvName = name;
+	this.kvObj = {};
+	this.kvReady = false;
 
-	kvInit: function(callback) {
-		if (!kvStore.kvReady) {
+	this.kvInit = function(initCallback) {
+		if (!this.kvReady) {
 			chrome.storage.local.get(
-				'pricyKvStore',
-				function(ks) {
-					kvStore.kvStore = ks["pricyKvStore"] || {};
-					kvStore.kvReady = true;
+				this.kvName,
+				function(kvs) {
+					this.kvObj = kvs[this.kvName] || {};
+					this.kvReady = true;
 
 					// Execute user-defined function
-					if (callback) {
-						setTimeout(callback(), 10);
+					if (initCallback) {
+						setTimeout(initCallback(), 10);
 					}
 				}
 			);
-		} else if(callback) {
-			callback();
+		} else if(initCallback) {
+			initCallback();
 		}
-	},
+	}
+	this.kvInit(initCallback);
 
-	kvSave: function() {
-		var kvs = kvStore.kvStore;
-		console.log("saving!");
-		console.log(kvs);
-		chrome.storage.local.set({'pricyKvStore': kvs});
-	},
+	this.kvSave = function() {
+		var kn = this.kvName;
+		chrome.storage.local.set({kn: this.kvObj}, null);
+	}
 
-	kvGet: function (k) {
-		if (!kvStore.kvReady)
-			throw "kvStore not yet ready!";
-		return kvStore.kvStore[k];
-	},
+	this.kvGet = function (k) {
+		return this.kvObj[k];
+	}
 
-	kvSet: function (k, v) {
-		if (!kvStore.kvReady)
-			throw "kvStore not yet ready!";
-		kvStore.kvStore[k] = v;
+	this.kvSet = function (k, v) {
+		this.kvObj[k] = v;
 	}
 };

@@ -7,12 +7,17 @@ var Misc = {
 	},
 
 	// Replace a needle at the front of a string with another string
-	replaceStart: function(h, n, r) {
-		var nl = n.length;
-		if (nl > h.length || h.slice(0, nl) !== n) {
+	replaceStart: function(h, n, r) { 
+		if (!Misc.startsWith(h,n)) {
 			return h;
 		} else {
-			return r + h.slice(nl);
+			return r + h.slice(n.length);
 		}
+	},
+
+	// Standard startsWith function
+	startsWith: function(h, n) {
+		var nl = n.length;
+		return nl <= h.length && h.slice(0, nl) === n;
 	}
 }

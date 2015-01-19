@@ -6,12 +6,6 @@
   "description": "Displays prices from TF2 item exchanges on top trading sites",
   "version": "0.1",
 
-  "permissions": [
-    "storage",
-    "http://*.tf2wh.com/priceguide",
-    "http://*.trade.tf/spreadsheet"
-  ],
-
   "content_scripts": [
     {
       "matches": ["http://bazaar.tf/*"],
@@ -25,6 +19,12 @@
   ],
 
   "offline_enabled": false,
+
+  "permissions": [
+    "storage",
+    "http://*.tf2wh.com/priceguide",
+    "http://*.trade.tf/spreadsheet"
+  ],
 
   "browser_action": {
     "default_icon": "icon copy.png",

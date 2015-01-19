@@ -36,7 +36,7 @@ var Options = {
 
 	/* Specify whether Trade.tf stats are displayed */
 	PRICES_SHOW_TRADETF: function () {
-		return true;
+		return false;
 	},
 
 	/* Specify whether Backpack.tf stats are displayed */
