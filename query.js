@@ -3,26 +3,40 @@ var PricyQuery = {
 	/* Normalize query names */
 	normalizeName: function(name, removeThe) {
 
+		// TODO: Organize list below from most common to most rare
+		// TODO: Bail out of name replacement loop when name changes
+
 		// Convert strange types (eg. "Face-melting") to "Strange"
 		var types = [
-			// Original strange types
-			"Unremarkable ","Scarcely Lethal ","Mildly Menacing ","Somewhat Threatening ",
-			"Uncharitable ","Notably Dangerous ","Sufficiently Lethal ","Truly Feared ",
-			"Spectacularly Lethal ","Gore-Spattered ","Wicked Nasty ","Positively Inhumane ",
-			"Totally Ordinary ","Face-Melting ","Rage-Inducing ","Server-Clearing ","Epic ",
-			"Legendary ","Australian ","Hale's Own ",
+			// Original types        Invis watch types           Cosmetic types
+			"Unremarkable ",         "Scarcely Shocking ",       "Ragged",
+			"Scarcely Lethal ",      "Mildly Magnetizing ",      "Tacky",
+			"Mildly Menacing ",      "Somewhat Inducting ",      "Secondhand",
+			"Somewhat Threatening ", "Unfortunate ",             "Odious",
+			"Uncharitable ",         "Notably Deleterious ",     "Garish",
+			"Notably Dangerous ",    "Sufficiently Ruinous ",    "Comfortable",
+			"Sufficiently Lethal ",  "Truly Conducting ",        "Dapper",
+			"Truly Feared ",         "Spectacularly Pseudoful ", "Sharp",
+			"Spectacularly Lethal ", "Ion-Spattered ",           "Fancy",
+			"Gore-Spattered ",       "Wickedly Dynamizing ",     "Fancy Shmancy",
+			"Wicked Nasty ",         "Positively Plasmatic ",    "Fashionable",
+			"Positively Inhumane ",  "Circuit-Melting ",         "Glamorous",
+			"Totally Ordinary ",     "Nullity-Inducing ",        "Posh",
+			"Face-Melting ",         "Mann Co. Select ",         "Fabulous",
+			"Rage-Inducing ",                                    "Stunning",
+			"Server-Clearing ",                                  "Mannceaux Signature Collection",
+			"Epic ",
+			"Legendary ",
+			"Australian ",
+			"Hale's Own "];
 
-			// Additional strange types
-			"Scarcely Shocking ","Mildly Magnetizing ","Somewhat Inducting ","Unfortunate ",
-			"Notably Deleterious ","Sufficiently Ruinous ","Truly Conducting ","Spectacularly Pseudoful ",
-			"Ion-Spattered ","Wickedly Dynamizing ","Positively Plasmatic ","Circuit-Melting ",
-			"Nullity-Inducing ","Mann Co. Select ",
-
-			// More strange types
-			"Garish ", "Fancy Shmancy "];
-		var i;
+		var i, t;
 		for (i=0; i<types.length; i++) {
-			name = Misc.replaceStart(name, types[i], "Strange ");
+			t = types[i];
+			if (name.slice(0, t.length) === t) {
+				name = "Strange " + name.slice(t.length);
+				break;
+			}
 		}
 
 		// Remove 'the'

@@ -83,6 +83,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 			// Get line
 			line = noteLines[i];
+			console.log(line)
 			if (!line || line.length < 2) {
 				continue; // Skip null lines
 			}
@@ -117,7 +118,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
 	var showParts, i, pJson, loCur, hiCur, keyRefRatio, unitRatio; // Other loop vars
 	keyRefRatio = null;
-	if (json && json !== "?") {
+	if (json && json["l"] !== "?") {
 		try {
 
 			// Init variables
@@ -130,41 +131,36 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			showParts = false;
 			if (Options.PRICES_SHOW_WITH_PARTS() && parts.length > 0) {
 				for (i=0; i<parts.length; i++) {
-					try {
-						pJson = PricyQuery.queryTradeTF(parts[i], true, true);
-						if (pJson) {
-							//pJson = JSON.parse(pJson);
-							loCur = pJson["l"];
-							hiCur = pJson["h"];
+					pJson = PricyQuery.queryTradeTF(parts[i], true, true);
+					if (pJson) {
+						//pJson = JSON.parse(pJson);
+						loCur = pJson["l"];
+						hiCur = pJson["h"];
 
-							// Make sure part and original item are in terms of the same thing
-							if (json["uh"] != pJson["uh"]) {
+						// Make sure part and original item are in terms of the same thing
+						if (json["uh"] != pJson["uh"]) {
 
-								// Common vars
-								if (!keyRefRatio) {
-									keyRefRatio = PricyQuery.queryTradeTF("Mann Co. Supply Crate Key", true, false);
-									keyRefRatio = (keyRefRatio["l"] + keyRefRatio["h"])/2;
-								}
-
-								// Assuming parts are traded in terms of keys and ref exclusively
-								// (since not doing so increases complexity significantly)
-								if (pJson["uh"] === "key") {
-									loCur *= keyRefRatio;
-									hiCur *= keyRefRatio;
-								} else {
-									loCur /= keyRefRatio;
-									hiCur /= keyRefRatio;
-								}
+							// Common vars
+							if (!keyRefRatio) {
+								keyRefRatio = PricyQuery.queryTradeTF("Mann Co. Supply Crate Key", true, false);
+								keyRefRatio = (keyRefRatio["l"] + keyRefRatio["h"])/2;
 							}
 
-							// Accumulate
-							showParts = true;
-							loParts += loCur;
-							hiParts += hiCur;
+							// Assuming parts are traded in terms of keys and ref exclusively
+							// (since not doing so increases complexity significantly)
+							if (pJson["uh"] === "key") {
+								loCur *= keyRefRatio;
+								hiCur *= keyRefRatio;
+							} else {
+								loCur /= keyRefRatio;
+								hiCur /= keyRefRatio;
+							}
 						}
-					}
-					catch (ex) {
-						console.log(ex);
+
+						// Accumulate
+						showParts = true;
+						loParts += loCur;
+						hiParts += hiCur;
 					}
 				}
 			}
@@ -179,10 +175,10 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 						"TF2WH error: " + ex +
 					"</p>";
 				}
-				loAlone = Misc.centify(loAlone * unitRatio);
-				loParts = Misc.centify(loParts * unitRatio);
-				hiAlone = Misc.centify(hiAlone * unitRatio);
-				hiParts = Misc.centify(hiParts * unitRatio);
+				loAlone = (loAlone * unitRatio).toFixed();
+				loParts = (loParts * unitRatio).toFixed();
+				hiAlone = (hiAlone * unitRatio).toFixed();
+				hiParts = (hiParts * unitRatio).toFixed();
 			} else {
 				loParts = Misc.centify(loParts);
 				hiParts = Misc.centify(hiParts);
@@ -198,7 +194,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 					faIcon;
 			if (showParts) {
 				asi += 
-					",&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" +
 						"<span class='fa fa-plus-square-o'/>&nbsp;&nbsp;" +
 						loParts + (loParts == hiParts ? "" : " - " + hiParts) + 
 						faIcon;
@@ -213,10 +209,20 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			return "<p>Error: " + ex + "</p>";
 		}
 	} else {
+
+		// Create error message
+		var errorMsg = "No match found";
+		if (customNamed) {
+			errorMsg = "Custom names not yet supported";
+		} else if (json && json["l"] == "?") {
+			errorMsg = "Price is uncertain";
+		}
+
+		// Append to ASI
 		asi = 
 			"<p style='color:red'>" +
 				"<img style='width: 25px' src='" + tradetf_favicon + "' /> " +
-				(customNamed ? "Custom names not yet supported" : "No match found.") +
+				errorMsg +
 			"</p>";
 		return asi;
 	}

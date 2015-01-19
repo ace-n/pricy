@@ -9,7 +9,7 @@ var Misc = {
 	// Replace a needle at the front of a string with another string
 	replaceStart: function(h, n, r) {
 		var nl = n.length;
-		if (nl < h.length || h.slice(0, nl) !== h) {
+		if (nl > h.length || h.slice(0, nl) !== n) {
 			return h;
 		} else {
 			return r + h.slice(nl);
