@@ -25,7 +25,6 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 	var buyPrice, sellPrice, toggle; // Other loop vars
 	if (newJson) {
 		try {
-			//newJson = JSON.parse(newJson);
 
 			// Compute prices
 			toggle = (Options.PRICE_DISPLAY_MODE() == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE() ? "-u" : "");
@@ -253,19 +252,21 @@ var INTERNAL_addItem = function (item) {
 		// Query TF2WH
 		var tryingLater = false;
 		if (Options.PRICES_SHOW_TF2WH()) {
-			//try {
+			try {
 				newDetails += INTERNAL_addItemTF2WH(item, attrs);
-			//}
-			/* catch (ex) {
-				console.log(ex);
-				tryingLater = true;
-				setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
-				newDetails +=
-					"<p>" +
-						"<img style='width: 25px' src='" + wh_favicon + "' /> " +
-						ex +
-					"</p>";
-			} */
+			}
+			catch (ex) {
+				if (ex !== "Item not found.") {
+					console.log(ex);
+					tryingLater = true;
+					setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
+					newDetails +=
+						"<p>" +
+							"<img style='width: 25px' src='" + wh_favicon + "' /> " +
+							ex +
+						"</p>";
+				}
+			}
 		}
 
 		// Query Trade.tf
@@ -274,15 +275,18 @@ var INTERNAL_addItem = function (item) {
 				newDetails += INTERNAL_addItemTradeTF(item, attrs)
 			}
 			catch (ex) {
-				if (!tryingLater) {
-					setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
+				if (ex !== "Item not found.") {
+					console.log(ex);
+					if (!tryingLater) {
+						setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
+					}
+					tryingLater = true;
+					newDetails +=
+						"<p>" +
+							"<img style='width: 25px' src='" + tradetf_favicon + "' /> " +
+							ex +
+						"</p>";
 				}
-				tryingLater = true;
-				newDetails +=
-					"<p>" +
-						"<img style='width: 25px' src='" + tradetf_favicon + "' /> " +
-						ex +
-					"</p>";
 			}
 		}
 
@@ -298,12 +302,12 @@ var InitialInterop = function () {
 	var items = document.getElementsByClassName("item");
 	var item, attrs, i;
 	for (i=0; i<items.length; i++) {
-		//try {
+		try {
 			INTERNAL_addItem(items[i]);
-		//}
-		//catch (ex) {
-		//	console.log(ex);
-		//}
+		}
+		catch (ex) {
+			console.log(ex);
+		}
 	}
 };
 
@@ -350,5 +354,4 @@ var listen = function() {
 };
 
 /* Init kvStore */
-var store = new kvStore("pricyItems", null);
-console.log(store);
+var store = new kvStore("pricyItems", listen);

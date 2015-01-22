@@ -49,7 +49,7 @@ var PricyQuery = {
 
 	/* Conduct XHRs/XHR caching */
 	xhrQuery: function (store, url, prefix, rowsF, callbackF) {
-		
+
 		// Don't repeat XHR queries
 		if (store.kvGet(prefix + "-querying") === "1")
 			return null;
@@ -64,7 +64,7 @@ var PricyQuery = {
 		var callback = callbackF;
 		var rows = rowsF;
 		req.open("GET", url, true);
-		req.onload = function (resp) { console.log(callback(rows(req.response))); };
+		req.onload = function (resp) { callback(store, rows(req.response)); };
 
 		// Send XHR
 		req.send(null);
@@ -93,7 +93,7 @@ var PricyQuery = {
 		// Re-query Trade.tf iff. current cache is expired
 		exp = store.kvGet("trd-exp");
 		if (!exp || exp < Date.now()) {
-			PricyQuery.updateTradeTF();
+			PricyQuery.updateTradeTF(store);
 			throw "Updating Trade.tf data..."
 		}
 
@@ -173,14 +173,14 @@ var PricyQuery = {
 				json = {};
 				cols = rows[i].getElementsByTagName("td");
 				name = PricyQuery.normalizeName(name, true);
-				PricyQuery.updateItemTradeTF(name, "", cols[1], 0);
+				PricyQuery.updateItemTradeTF(store, name, "", cols[1], 0);
 				if (bwe_idx != -1)
-					PricyQuery.updateItemTradeTF(name, "AddonPart", cols[1], 2);
-				PricyQuery.updateItemTradeTF(name, "Uncraftable", cols[2], 0);
-				PricyQuery.updateItemTradeTF(name, "Vintage", cols[3], 0);
-				PricyQuery.updateItemTradeTF(name, "Genuine", cols[4], 0);
-				PricyQuery.updateItemTradeTF(name, "Strange", cols[5], 0);
-				PricyQuery.updateItemTradeTF(name, "Haunted", cols[6], 0);
+					PricyQuery.updateItemTradeTF(store, name, "AddonPart", cols[1], 2);
+				PricyQuery.updateItemTradeTF(store, name, "Uncraftable", cols[2], 0);
+				PricyQuery.updateItemTradeTF(store, name, "Vintage", cols[3], 0);
+				PricyQuery.updateItemTradeTF(store, name, "Genuine", cols[4], 0);
+				PricyQuery.updateItemTradeTF(store, name, "Strange", cols[5], 0);
+				PricyQuery.updateItemTradeTF(store, name, "Haunted", cols[6], 0);
 			}
 
 			// Reset hardcoded items
@@ -220,9 +220,9 @@ var PricyQuery = {
 				variants++;
 			}
 
-			// Return null if TF2WH doesn't accept this item
+			// Raise an error if TF2WH doesn't accept this item
 			if (variants == 2) {
-				return null;
+				throw "Item not found.";
 			}
 		}
 
@@ -234,12 +234,13 @@ var PricyQuery = {
 		// Re-query TF2WH iff. current cache is expired
 		exp = store.kvGet("wh-exp");
 		if (!exp || exp < Date.now()) {
-			PricyQuery.updateTF2WH();
+			PricyQuery.updateTF2WH(store);
 			throw "Updating TF2WH data..."
 		}
 
 		// Grab from cache
-		return store.kvGet("wh_" + name);
+		var result = store.kvGet("wh_" + name);
+		if (result) { return result; } else { throw "Item not found." };
 	},
 
 	// TF2WH item font conversion helper

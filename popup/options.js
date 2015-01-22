@@ -1,4 +1,4 @@
-window.onload = function () {
+var callback = function () {
 
 	/* Remove no-JS notifier */
 	var noJS = document.getElementById("noJS");
@@ -19,9 +19,9 @@ window.onload = function () {
 			t.removeClass("fa-check-square-o")
 		}
 
-		// Save appropriate property
-		var tid = tbx.attr("name");
-		chrome.storage.sync.set({tid: val});
+		// Save appropriate property 
+		store.kvSet(tbx.attr("name"), val);
+		store.kvSave();
 	});
 
 	/* Radio-button listeners */
@@ -36,7 +36,8 @@ window.onload = function () {
 		t.removeClass("fa-circle-o").addClass("fa-dot-circle-o");
 
 		// Record value
-		chrome.storage.sync.set({name: t.attr("value")});
+		store.kvSet(name, t.attr("value"));
+		store.kvSave();
 	});
 
 	/* Num-box helper function */
@@ -86,8 +87,8 @@ window.onload = function () {
 		numboxBoundUpdate(t, tbx, idx);
 
 		// Update stored properties
-		var tid = tbx.attr("id");
-		chrome.storage.sync.set({tid: Options.PERIODS[idx]});
+		store.kvSet(tbx.attr("id"), Options.PERIODS[idx]);
+		store.kvSave();
 	});
 
 	/* Disable double click highlighting */
@@ -95,3 +96,6 @@ window.onload = function () {
 	$(".radio").on("selectstart", false);
 	$(".numbox").on("selectstart", false);
 }
+
+/* Initialize kvStore instance */
+var store = new kvStore("pricyOptions", callback);
