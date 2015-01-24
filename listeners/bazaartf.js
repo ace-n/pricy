@@ -27,7 +27,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 		try {
 
 			// Compute prices
-			toggle = (Options.PRICE_DISPLAY_MODE(optionsStore) == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE(optionsStore) ? "-u" : "");
+			toggle = (Options.PRICE_CURRENCY_MODE(optionsStore) == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE(optionsStore) ? "-u" : "");
 			buyPrice = newJson["b" + toggle];
 			sellPrice = newJson["s" + toggle];
 
@@ -125,7 +125,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 			// Calculate lo/hi with parts prices (if applicable)
 			showParts = false;
-			if (Options.PRICES_SHOW_WITH_PARTS(optionsStore) && parts.length > 0) {
+			if (Options.PRICES_PARTS_DISPLAY_MODE(optionsStore) !== 0 && parts.length > 0) {
 				for (i=0; i<parts.length; i++) {
 					pJson = PricyQuery.queryTradeTF(itemsStore, parts[i], true, true);
 					if (pJson) {
@@ -162,7 +162,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			}
 
 			// Convert lo/hi prices to appropriate units
-			if (Options.PRICE_DISPLAY_MODE(optionsStore) === 0) {
+			if (Options.PRICE_CURRENCY_MODE(optionsStore) === 0) {
 				try {
 					unitRatio = PricyQuery.queryTF2WH(itemsStore, json["u"], true)["bp"];
 				} catch (ex) {
@@ -181,7 +181,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			}
 
 			// Add details to HTML
-			faIcon = (Options.PRICE_DISPLAY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
+			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
 			asi = 
 				"<p>" +
 					"<img style='width: 25px' src='" + tradetf_favicon + "'/>" +

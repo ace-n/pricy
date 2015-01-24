@@ -185,6 +185,10 @@ a {
 	float: right;
 }
 
+.cbxes-infoFrom > span {
+	padding-right: 19px;
+}
+
 .radio {
 	color: #FF7400;
 	cursor: pointer;

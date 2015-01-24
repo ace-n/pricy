@@ -24,50 +24,63 @@
 			<!-- JS notifier -->
 			<p id="noJS">Error: Pricy requires JavaScript to function.</p>
 
-			<!-- Site toggles -->
+			<!-- Displayed site toggles -->
 			<h2>Enable on:</h2>
 			<div class="cbxes-panel">
 				<div class="left">
 					<span>
-						<span class="checkbox fa fa-square-o" name="enable_bazaartf"></span>
+						<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_ON_BAZAAR"></span>
 						Bazaar.tf
 					</span>
 					<span>
-						<span class="checkbox fa fa-square-o" name="enable_backpacktf"></span>
+						<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_ON_BPTF"></span>
 						Backpack.tf
 					</span>
 					<span>
-						<span class="checkbox fa fa-square-o" name="enable_tradetf"></span>
+						<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_ON_TRADETF"></span>
 						Trade.tf
 					</span>
 				</div>
 				<div class="right">
 					<span>
-						<span class="checkbox fa fa-square-o" name="enable_tf2wh"></span>
+						<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_ON_TF2WH"></span>
 						TF2 WH
 					</span>
 					<span>
-						<span class="checkbox fa fa-square-o" name="enable_tf2outpost"></span>
+						<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_ON_TF2OP"></span>
 						TF2 Outpost
 					</span>
 				</div>
 			</div>
 
+			<!-- Queried site toggles -->
+			<h2>Show info from:</h2>
+			<div class="cbxes-panel cbxes-infoFrom">
+				<span>
+					<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_TF2WH"></span>
+					TF2 WH
+				</span>
+				<span>
+					<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_TRADETF"></span>
+					Trade.tf
+				</span>
+				<span>
+					<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_BPTF"></span>
+					Backpack.tf
+				</span>
+			</div>
+
+
 			<!-- Price display mode -->
-			<h2>Price display mode</h2>
-			Display prices in:
+			<h2>Currency mode</h2>
 			<div class="rbns">
 				<span>
-					<span class="radio fa fa-circle-o" name="priceMode" value="0"></span> 
-					TF2WH c only
+					<span class="radio fa fa-dot-circle-o" name="PRICE_CURRENCY_MODE" value="0"></span> 
+					TF2WH c
 				</span>
 				<span>
-					<span class="radio fa fa-dot-circle-o" name="priceMode" value="1"></span>
-					Items only
-				</span>
-				<span>
-					<span class="radio fa fa-circle-o" name="priceMode" value="2"></span> 
-					Both
+					<span class="radio fa fa-circle-o" name="PRICE_CURRENCY_MODE" value="1"></span>
+					Items
 				</span>
 			</div>
 
@@ -101,19 +114,19 @@
 			</div>
 
 			<!-- "With parts" handling -->
-			<h2>Addon pricing (TODO)</h2>
+			<h2>Addon pricing</h2>
 			If an item has addons, show:
 			<div class="rbns">
 				<span>
-					<span class="radio fa fa-circle-o" name="priceAddons" value="0"></span> 
+					<span class="radio fa fa-circle-o" name="PRICES_PARTS_DISPLAY_MODE" value="0"></span> 
 					total price
 				</span>
 				<span>
-					<span class="radio fa fa-dot-circle-o" name="priceAddons" value="1"></span>
+					<span class="radio fa fa-circle-o" name="PRICES_PARTS_DISPLAY_MODE" value="1"></span>
 					item-only price
 				</span>
 				<span>
-					<span class="radio fa fa-circle-o" name="priceAddons" value="2"></span> 
+					<span class="radio fa fa-circle-o" name="PRICES_PARTS_DISPLAY_MODE" value="2"></span> 
 					both
 				</span>
 			</div>

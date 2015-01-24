@@ -9,9 +9,14 @@ var Options = {
 		return false;
 	},
 
-	/* Specify whether Trade.tf "with parts" prices are displayed */
-	PRICES_SHOW_WITH_PARTS: function (optionsStore) {
-		return true;
+	/* Specify whether Trade.tf "with parts" prices are displayed 
+	 * - 0 = Display item-only price
+	 * - 1 = Display with parts price (if available)
+	 * - 2 = Display both prices
+	*/
+	PRICES_PARTS_DISPLAY_MODE: function (optionsStore) {
+		console.log(parseInt(optionsStore.kvGet("PRICES_PARTS_DISPLAY_MODE"), 10));
+		return parseInt(optionsStore.kvGet("PRICES_PARTS_DISPLAY_MODE"), 10) || 2;
 	},
 
 	/* Specify whether Free or Premium (Ultimate) prices are shown for TF2WH */
@@ -27,21 +32,20 @@ var Options = {
 	/* Specify price display mode
 	 * - 0 = All prices in WHc
 	 * - 1 = All prices in items (ref/keys/buds)
-	 * - 2 = WH prices in WHc, others in items
 	 */
-	PRICE_DISPLAY_MODE: function (optionsStore) {
-		return 0;
+	PRICE_CURRENCY_MODE: function (optionsStore) {
+		return optionsStore.kvGet("PRICE_CURRENCY_MODE") === "1" ? 1 : 0;
 	},
 
 	/******************************************************/
 	/* Specify whether TF2WH stats are displayed */
 	PRICES_SHOW_TF2WH: function (optionsStore) {
-		return true;
+		return optionsStore.kvGet("PRICES_SHOW_TF2WH") !== 0;
 	},
 
 	/* Specify whether Trade.tf stats are displayed */
 	PRICES_SHOW_TRADETF: function (optionsStore) {
-		return false;
+		return optionsStore.kvGet("PRICES_SHOW_TRADETF") !== 0;
 	},
 
 	/* Specify whether Backpack.tf stats are displayed */
@@ -60,7 +64,7 @@ var Options = {
 	/******************************************************/
 	/* Specify whether stats are displayed on Bazaar.tf */
 	PRICES_SHOW_ON_BAZAAR: function (optionsStore) {
-		return true;
+		return optionsStore.kvGet("PRICES_SHOW_ON_BAZAAR") !== 0;
 	}
 
 	/* Specify whether stats are displayed on TF2Outpost.com */

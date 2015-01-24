@@ -1,3 +1,8 @@
+// DEBUG
+var clog = function(s) {
+	chrome.extension.getBackgroundPage().console.log(s)
+}
+
 var callback = function () {
 
 	/* Remove no-JS notifier */
@@ -5,11 +10,12 @@ var callback = function () {
 	noJS.style.display = 'none';
 
 	/* Checkbox initializers */
-	$("[minidx]").each(function () {
+	$(".checkbox").each(function () {
 		var t = $(this);
-		if (store.kvGet(t.attr("name")) === 1) {
-			t.removeClass("fa-square-o");
-			t.addClass("fa-check-square-o");
+		var c = store.kvGet(t.attr("name"));
+		if (c && c !== 1) {
+			t.addClass("fa-square-o");
+			t.removeClass("fa-check-square-o");
 		}
 	});
 
@@ -28,13 +34,27 @@ var callback = function () {
 			t.removeClass("fa-check-square-o")
 		}
 
-		// Save appropriate property 
-		store.kvSet(tbx.attr("name"), val);
+		// Save appropriate property
+		store.kvSet(t.attr("name"), val);
 		store.kvSave();
+	});
+
+	/* Radio-button initializers */
+	$(".radio").each(function () {
+		var t = $(this);
+		var c = store.kvGet(t.attr("name"));
+		if (c == t.attr("value")) {
+			t.removeClass("fa-circle-o");
+			t.addClass("fa-dot-circle-o");
+		} else if (c) {
+			t.addClass("fa-circle-o");
+			t.removeClass("fa-dot-circle-o");
+		}
 	});
 
 	/* Radio-button listeners */
 	$(".radio").click(function () {
+
 		var t = $(this);
 
 		// Uncheck all buttons in group
@@ -46,6 +66,7 @@ var callback = function () {
 
 		// Record value
 		store.kvSet(name, t.attr("value"));
+		clog(name);
 		store.kvSave();
 	});
 
@@ -107,4 +128,4 @@ var callback = function () {
 }
 
 /* Initialize kvStore instance */
-var store = new kvStore("pricyOptions", callback, false);
+var store = new kvStore("pricyOptions", callback, true);
