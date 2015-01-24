@@ -3,37 +3,39 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 
 	console.log(alarm.name);
 
+	var doQuery = function() {
+		// Query appropriate site
+		switch (name) {
+			case "tf2wh":
+				PricyQuery.updateTF2WH(itemsStore);
+				period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
+				break;
+			case "trdTf":
+				PricyQuery.updateTradeTF(itemsStore);
+				period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
+				break;
+			default:
+				throw "Invalid alarm name";
+		};
+
+		// Schedule next query
+		var period;
+		switch (name) {
+			case "tf2wh":
+				period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
+				break;
+			case "trdTf":
+				period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
+				break;
+			default:
+				throw "Invalid alarm name";
+		};
+		chrome.alarms.create(name, {"when": Date.now() + period * 60000});
+	}
+
 	// Init
 	var name = alarm.name;
-	var optionsStore = new kvStore("pricyOptions", listen, false); // Keep this updated
-
-	// Query appropriate site
-	switch (name) {
-		case "tf2wh":
-			PricyQuery.queryTF2WH(itemsStore);
-			period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
-			break;
-		case "trdTf":
-			PricyQuery.queryTradeTF(itemsStore);
-			period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
-			break;
-		default:
-			throw "Invalid alarm name";
-	};
-
-	// Schedule next query
-	var period;
-	switch (name) {
-		case "tf2wh":
-			period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
-			break;
-		case "trdTf":
-			period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
-			break;
-		default:
-			throw "Invalid alarm name";
-	};
-	chrome.alarms.create(name, {"when": Date.now() + period * 1000});
+	var optionsStore = new kvStore("pricyOptions", doQuery, false); // Keep this updated
 });
 
 /************************* kvStore *************************/

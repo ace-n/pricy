@@ -18,16 +18,17 @@ function kvStore(name, initCallback, writable) {
 
 				// Execute user-defined function
 				if (typeof initCallback === "function") {
-					setTimeout(initCallback(), 10);
+					setTimeout(initCallback, 10);
 				}
 			}
 		);
 	}
-	this.kvInit(initCallback);
+	this.kvInit(initCallback); // Auto-init in constructor
 
 	this.kvSave = function() {
-		var kn = this.kvName;
-		chrome.storage.local.set({kn: this.kvObj});
+		var ko = {}
+		ko[this.kvName] = this.kvObj;
+		chrome.storage.local.set(ko, function() { console.log(ko); });
 	}
 
 	this.kvGet = function (k) {

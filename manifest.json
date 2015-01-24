@@ -7,7 +7,7 @@
   "version": "0.1",
 
   "background": {
-    "scripts": ["kvStore.js", "optionsIO.js", "backgroundPage.js"]
+    "scripts": ["misc.js", "kvStore.js", "optionsIO.js", "query.js", "backgroundPage.js"]
   },
 
   "content_scripts": [
