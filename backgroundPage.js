@@ -8,11 +8,9 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 		switch (name) {
 			case "tf2wh":
 				PricyQuery.updateTF2WH(itemsStore);
-				period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
 				break;
 			case "trdTf":
 				PricyQuery.updateTradeTF(itemsStore);
-				period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
 				break;
 			default:
 				throw "Invalid alarm name";
