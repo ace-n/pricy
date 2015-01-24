@@ -18,7 +18,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 		craftable = (notes.value.indexOf("(Not Craftable)") === -1);
 
 	// Query TF2WH (and throw an exception if query fails)
-	var newJson = PricyQuery.queryTF2WH(store, name, craftable);
+	var newJson = PricyQuery.queryTF2WH(itemsStore, name, craftable);
 	
 	// Add details to item
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
@@ -27,7 +27,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 		try {
 
 			// Compute prices
-			toggle = (Options.PRICE_DISPLAY_MODE() == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE() ? "-u" : "");
+			toggle = (Options.PRICE_DISPLAY_MODE(optionsStore) == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE(optionsStore) ? "-u" : "");
 			buyPrice = newJson["b" + toggle];
 			sellPrice = newJson["s" + toggle];
 
@@ -47,7 +47,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 		catch (ex) {
 			return "<p>Error: " + ex + "</p>";
 		}
-	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES()) {
+	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
 		asi = 
 			"<p style='color:red'>" +
 				"<img style='width: 25px' src='" + wh_favicon + "' />&nbsp;&nbsp;" +
@@ -98,7 +98,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			// - Strange [Cosmetic] Parts
 			else {
 				pName = line.replace(new RegExp(/:.+$/), "");
-				if (PricyQuery.queryTradeTF(store, "Strange Cosmetic Part: " + pName, true, false)) {
+				if (PricyQuery.queryTradeTF(itemsStore, "Strange Cosmetic Part: " + pName, true, false)) {
 					pName = "Strange Cosmetic Part: " + pName;
 				} else {
 					pName = "Strange Part: " + pName;
@@ -110,7 +110,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 	}
 
 	// Query Trade.tf (and throw an exception if query fails)
-	var json = PricyQuery.queryTradeTF(store, name, craftable, false);
+	var json = PricyQuery.queryTradeTF(itemsStore, name, craftable, false);
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
 	var showParts, i, pJson, loCur, hiCur, keyRefRatio, unitRatio; // Other loop vars
 	keyRefRatio = null;
@@ -125,9 +125,9 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 			// Calculate lo/hi with parts prices (if applicable)
 			showParts = false;
-			if (Options.PRICES_SHOW_WITH_PARTS() && parts.length > 0) {
+			if (Options.PRICES_SHOW_WITH_PARTS(optionsStore) && parts.length > 0) {
 				for (i=0; i<parts.length; i++) {
-					pJson = PricyQuery.queryTradeTF(store, parts[i], true, true);
+					pJson = PricyQuery.queryTradeTF(itemsStore, parts[i], true, true);
 					if (pJson) {
 						//pJson = JSON.parse(pJson);
 						loCur = pJson["l"];
@@ -138,7 +138,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 
 							// Common vars
 							if (!keyRefRatio) {
-								keyRefRatio = PricyQuery.queryTradeTF(store, "Mann Co. Supply Crate Key", true, false);
+								keyRefRatio = PricyQuery.queryTradeTF(itemsStore, "Mann Co. Supply Crate Key", true, false);
 								keyRefRatio = (keyRefRatio["l"] + keyRefRatio["h"])/2;
 							}
 
@@ -162,9 +162,9 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			}
 
 			// Convert lo/hi prices to appropriate units
-			if (Options.PRICE_DISPLAY_MODE() === 0) {
+			if (Options.PRICE_DISPLAY_MODE(optionsStore) === 0) {
 				try {
-					unitRatio = PricyQuery.queryTF2WH(store, json["u"], true)["bp"];
+					unitRatio = PricyQuery.queryTF2WH(itemsStore, json["u"], true)["bp"];
 				} catch (ex) {
 					"<p>" +
 						"<img style='width: 25px' src='" + tradetf_favicon + "' /> " +
@@ -181,7 +181,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			}
 
 			// Add details to HTML
-			faIcon = (Options.PRICE_DISPLAY_MODE() === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
+			faIcon = (Options.PRICE_DISPLAY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
 			asi = 
 				"<p>" +
 					"<img style='width: 25px' src='" + tradetf_favicon + "'/>" +
@@ -204,7 +204,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			console.log(ex);
 			return "<p>Error: " + ex + "</p>";
 		}
-	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES()) {
+	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
 
 		// Create error message
 		var errorMsg = "No match found";
@@ -251,7 +251,7 @@ var INTERNAL_addItem = function (item) {
 
 		// Query TF2WH
 		var tryingLater = false;
-		if (Options.PRICES_SHOW_TF2WH()) {
+		if (Options.PRICES_SHOW_TF2WH(optionsStore)) {
 			try {
 				newDetails += INTERNAL_addItemTF2WH(item, attrs);
 			}
@@ -270,7 +270,7 @@ var INTERNAL_addItem = function (item) {
 		}
 
 		// Query Trade.tf
-		if (Options.PRICES_SHOW_TRADETF()) {
+		if (Options.PRICES_SHOW_TRADETF(optionsStore)) {
 			try {
 				newDetails += INTERNAL_addItemTradeTF(item, attrs)
 			}
@@ -341,17 +341,25 @@ var MutationInterop = function () {
 	}
 }
 
-// Run JS
-var listen = function() {
-	if (Options.PRICES_SHOW_ON_BAZAAR()) {
-		var t = Date.now();
+// Level 1 callback function
+var intermediate = function() {
 
-		// Functions
-		InitialInterop();
-		MutationInterop();
-		console.log((Date.now() - t).toString() + " ms");
-	}
-};
+	// Level 2 callback function
+	var listen = function() {
+		if (Options.PRICES_SHOW_ON_BAZAAR(optionsStore)) {
+			var t = Date.now();
 
-/* Init kvStore */
-var store = new kvStore("pricyItems", listen);
+			// Functions
+			InitialInterop();
+			MutationInterop();
+			console.log((Date.now() - t).toString() + " ms");
+		}
+	};
+
+	// Level 2 kvStore request
+	optionsStore = new kvStore("pricyOptions", listen, false);
+}
+
+// Level 1 kvStore request
+var optionsStore;
+var itemsStore = new kvStore("pricyItems", intermediate, false);

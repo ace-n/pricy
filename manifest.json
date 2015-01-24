@@ -6,6 +6,10 @@
   "description": "Displays prices from TF2 item exchanges on top trading sites",
   "version": "0.1",
 
+  "background": {
+    "scripts": ["kvStore.js", "optionsIO.js", "backgroundPage.js"]
+  },
+
   "content_scripts": [
     {
       "matches": ["http://bazaar.tf/*"],
@@ -21,6 +25,7 @@
   "offline_enabled": false,
 
   "permissions": [
+    "alarms",
     "storage",
     "http://*.tf2wh.com/priceguide",
     "http://*.trade.tf/spreadsheet"

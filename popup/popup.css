@@ -244,18 +244,16 @@ a {
 	color: #7F7F7F;
 }
 
-/* .checkbox,
-.radio {
-	border: 1px solid #FF7400;
-	display: inline;
-	font-size: 8px;
-	padding-left: 10px;
-	padding-top: 2px;
+.version {
+	color: red;
 }
 
-.checkbox.checked {
-	background-size: 10px 10px;
-	background-repeat: no-repeat;
-	background-image: url(check.png);
-	background-position: left 1px top 1px;
-} */
+.menu-body > .version {
+	padding-left: calc((130px - 76px) / 2);
+	font-size: 14px;
+}
+
+.info > .version {
+	padding-left: calc((250px - 101px) / 2);
+	font-size: 19px;
+}

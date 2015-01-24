@@ -4,6 +4,15 @@ var callback = function () {
 	var noJS = document.getElementById("noJS");
 	noJS.style.display = 'none';
 
+	/* Checkbox initializers */
+	$("[minidx]").each(function () {
+		var t = $(this);
+		if (store.kvGet(t.attr("name")) === 1) {
+			t.removeClass("fa-square-o");
+			t.addClass("fa-check-square-o");
+		}
+	});
+
 	/* Checkbox listeners */
 	$(".checkbox").click(function () {
 
@@ -98,4 +107,4 @@ var callback = function () {
 }
 
 /* Initialize kvStore instance */
-var store = new kvStore("pricyOptions", callback);
+var store = new kvStore("pricyOptions", callback, false);

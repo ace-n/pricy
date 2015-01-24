@@ -50,15 +50,6 @@ var PricyQuery = {
 	/* Conduct XHRs/XHR caching */
 	xhrQuery: function (store, url, prefix, rowsF, callbackF) {
 
-		// Don't repeat XHR queries
-		if (store.kvGet(prefix + "-querying") === "1")
-			return null;
-		store.kvSet(prefix + "-querying", "1");
-
-		// Set timeout (done here in case a request fails)
-		var ms = Date.now() + 60000*Options.UPDATE_TRADETF_FREQUENCY();
-		store.kvSet(prefix + "-exp", ms);
-
 		// Get HTML
 		var req = new XMLHttpRequest();
 		var callback = callbackF;
@@ -86,22 +77,11 @@ var PricyQuery = {
 		// Normalize name
 		name = PricyQuery.normalizeName(name, true);
 
-		// Throw "Querying..." error if a query is currently in progress
-		if (store.kvGet("trd-querying") === "1")
-			throw "Updating Trade.tf data..."
-
-		// Re-query Trade.tf iff. current cache is expired
-		exp = store.kvGet("trd-exp");
-		if (!exp || exp < Date.now()) {
-			PricyQuery.updateTradeTF(store);
-			throw "Updating Trade.tf data..."
-		}
-
 		// Fetch data from cache
 		return store.kvGet("trd_" + (asPart ? "AddonPart " : "") + (craftable ? "" : "Uncraftable ") + name);
 	},
 
-	// Actually query trade.tf itself
+	// Trade.tf helper function
 	updateItemTradeTF: function (store, name, quality, elem, childIdx) {
 		var obj = {};
 		if (elem) {
@@ -148,6 +128,7 @@ var PricyQuery = {
 		}
 	},
 
+	// Actually query trade.tf itself - SHOULD ONLY BE CALLED FROM BACKGROUND PAGE
 	updateTradeTF: function (store) {
 		rowFunc = function (response) {
 			var dp = new DOMParser();
@@ -226,18 +207,6 @@ var PricyQuery = {
 			}
 		}
 
-		// Throw "Querying..." error if a query is currently in progress
-		if (store.kvGet("trd-querying") === "1") {
-			throw "Updating Trade.tf data..."
-		}
-
-		// Re-query TF2WH iff. current cache is expired
-		exp = store.kvGet("wh-exp");
-		if (!exp || exp < Date.now()) {
-			PricyQuery.updateTF2WH(store);
-			throw "Updating TF2WH data..."
-		}
-
 		// Grab from cache
 		var result = store.kvGet("wh_" + name);
 		if (result) { return result; } else { throw "Item not found." };
@@ -251,7 +220,7 @@ var PricyQuery = {
 		return s;
 	},
 
-	// Actually query TF2WH itself
+	// Actually query TF2WH itself - SHOULD ONLY BE CALLED FROM BACKGROUND PAGE
 	updateTF2WH: function (store) {
 		rowFunc = function (response) {
 			var dp = new DOMParser();
