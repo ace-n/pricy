@@ -201,15 +201,12 @@ var PricyQuery = {
 				variants++;
 			}
 
-			// Raise an error if TF2WH doesn't accept this item
-			if (variants == 2) {
-				throw "Item not found.";
-			}
+			// Ignore items TF2WH doesn't accept
+			return null
 		}
 
 		// Grab from cache
-		var result = store.kvGet("wh_" + name);
-		if (result) { return result; } else { throw "Item not found." };
+		return store.kvGet("wh_" + name);
 	},
 
 	// TF2WH item font conversion helper

@@ -1,8 +1,8 @@
-/* Pricy data-interop for Bazaar.tf */
+/* Pricy data-interop for TF2Outpost.com */
 
 // Helper function
 var favify = function(url) {
-	return "<img style='width: 25px; position:relative; left:2px;' src='" + chrome.extension.getURL(url) + "' /> ";
+	return "<img style='width: 25px; position:relative; top:7px; left:5px;' src='" + chrome.extension.getURL(url) + "' /> ";
 }
 
 // Favicon URLs
@@ -13,14 +13,11 @@ var tradetf_favicon = favify('/icons/tradetf.ico');
 var INTERNAL_addItemTF2WH = function (item, attrs) {
 	
 	// Get data
-	var name = attrs["data-name"].value;
-	var customNamed = Misc.startsWith(name, "&quot;");
+	var name = (attrs["data-real-name"] || attrs["data-name"]).value;
 	var craftable = true;
-	if (customNamed)
-		name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-	var notes = attrs["data-notes"];
-	if (notes)
-		craftable = (notes.value.indexOf("(Not Craftable)") === -1);
+	var flags = attrs["data-flags"];
+	if (flags)
+		craftable = (flags.value.indexOf("(Not Craftable)") === -1);
 
 	// Query TF2WH (and throw an exception if query fails)
 	var newJson = PricyQuery.queryTF2WH(itemsStore, name, craftable);
@@ -38,7 +35,7 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 
 			// Add details to HTML
 			asi = 
-				"<p>" +
+				"<p style='color:white'>" +
 					wh_favicon +
 					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
 					"<span class='fa fa-inbox' />: " + newJson["h"] + "/" + newJson["m"] +
@@ -65,20 +62,18 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 // Trade.tf item adding helper function
 var INTERNAL_addItemTradeTF = function (item, attrs) {
 	
-	// Get initial data
-	var name = attrs["data-name"].value;
-	var customNamed = name.indexOf("&quot;") == 0;
+	// Get data
+	var name = (attrs["data-real-name"] || attrs["data-name"]).value;
 	var craftable = true;
-	if (customNamed)
-		name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-	
+	var flags = attrs["data-flags"];
+	if (flags)
+		craftable = (flags.value.indexOf("(Not Craftable)") === -1);
+
 	// Get more data + additional parts (strange addons/paints)
-	var notes = attrs["data-notes"];
+	var notes = attrs["data-attributes"];
 	var parts = [];
 	if (notes) {
-		craftable = (notes.value.indexOf("(Not Craftable)") === -1);
-
-		var noteLines = (notes.value.slice(1, -1)).split(/<.+?>/g);
+		var noteLines = (notes.value.slice(5)).split(/<.+?>/g);
 		var i, line, pName;
 		var dp = new DOMParser();
 		var isFirstLine = true;
@@ -170,7 +165,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 				try {
 					unitRatio = PricyQuery.queryTF2WH(itemsStore, json["u"], true)["bp"];
 				} catch (ex) {
-					"<p>" + tradetf_favicon + " TF2WH error: " + ex + "</p>";
+					"<p style='color:red'>" + tradetf_favicon + "TF2WH error: " + ex + "</p>";
 				}
 				loAlone = (loAlone * unitRatio).toFixed();
 				loParts = (loParts * unitRatio).toFixed();
@@ -184,7 +179,7 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 			// Add details to HTML
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
 			asi = 
-				"<p>" +
+				"<p style='color:white'>" +
 					tradetf_favicon +
 					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
 					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) +
@@ -226,18 +221,14 @@ var INTERNAL_addItem = function (item) {
 		return null;
 
 	// Skip actual non-TF2 items
-	else if (!attrs["data-game"] || attrs["data-game"].value != 440)
-		return null;
-
-	// Skip internal items (e.g. "Offers")
-	else if (!attrs["data-defindex"] || attrs["data-defindex"].value < 0)
+	if (!attrs["data-hash"] || !Misc.startsWith(attrs["data-hash"].value, "440"))
 		return null;
 
 	// Add additional data
 	ael = function(item, attrs, origDetails) {
 
 		// Get data
-		var newDetails = attrs['data-details'].value;
+		var newDetails = attrs['data-subtitle'].value;
 		if (origDetails)
 			newDetails = origDetails;
 		else if (!newDetails)
@@ -277,13 +268,14 @@ var INTERNAL_addItem = function (item) {
 		}
 
 		if (newDetails) {
-			item.setAttribute("data-details", newDetails);
+			item.setAttribute("data-subtitle", newDetails);
 		}
 	};
-	ael(item, attrs, attrs['data-details'].value);
+	ael(item, attrs, attrs['data-subtitle'].value);
 }
 
 // Initial event interop
+// Note: TF2Outpost.com doesn't require a mutation interop
 var InitialInterop = function () {
 	var items = document.getElementsByClassName("item");
 	var item, attrs, i;
@@ -297,47 +289,16 @@ var InitialInterop = function () {
 	}
 };
 
-// Mutation interop
-var MutationInterop = function () {
-	
-	var item_lists = document.getElementsByClassName("item-list");
-	var i;
-	for (i=0; i<item_lists.length; i++) {
-		 
-		// Create observer
-		var ob = new MutationObserver(function(ms) {
-			ms.forEach(function(m) {
-				items = m.addedNodes;
-				for (i=0; i<items.length; i++) {
-					try {
-						INTERNAL_addItem(items[i]);
-					}
-					catch (ex) {
-						console.log(ex);
-					}
-				}
-			});    
-		});
-		 
-		// Configure observer
-		var config = { attributes: true, childList: true, characterData: true };
-		 
-		// Register observer
-		ob.observe(item_lists[i], config);
-	}
-}
-
 // Level 1 callback function
 var intermediate = function() {
 
 	// Level 2 callback function
 	var listen = function() {
-		if (Options.PRICES_SHOW_ON_BAZAAR(optionsStore)) {
+		if (Options.PRICES_SHOW_ON_TF2OP(optionsStore)) {
 			var t = Date.now();
 
 			// Functions
 			InitialInterop();
-			MutationInterop();
 			console.log((Date.now() - t).toString() + " ms");
 		}
 	};
@@ -348,4 +309,5 @@ var intermediate = function() {
 
 // Level 1 kvStore request
 var optionsStore;
+console.log("ON OPTF!");
 var itemsStore = new kvStore("pricyItems", intermediate, false);

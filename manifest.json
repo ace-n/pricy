@@ -12,8 +12,14 @@
 
   "content_scripts": [
     {
-      "matches": ["http://bazaar.tf/*"],
+      "matches": ["http://bazaar.tf/*", "http://www.tf2outpost.com/*"],
+      "css": ["fontAwesome/css/font-awesome.min.css"],
       "js": ["kvStore.js", "misc.js", "constants.js", "optionsIO.js", "query.js"]
+    },
+
+    {
+      "matches": ["http://www.tf2outpost.com/*"],
+      "js": ["listeners/tf2outpost.js"]
     },
 
     {

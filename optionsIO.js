@@ -65,9 +65,13 @@ var Options = {
 	/* Specify whether stats are displayed on Bazaar.tf */
 	PRICES_SHOW_ON_BAZAAR: function (optionsStore) {
 		return optionsStore.kvGet("PRICES_SHOW_ON_BAZAAR") !== 0;
-	}
+	},
 
 	/* Specify whether stats are displayed on TF2Outpost.com */
+	PRICES_SHOW_ON_TF2OP: function (optionsStore) {
+		return optionsStore.kvGet("PRICES_SHOW_ON_TF2OP") !== 0;
+	}
+
 	/* Specify whether stats are displayed on Trade.tf */
 	/* Specify whether stats are displayed on TF2WH.com */
 	/* Specify whether stats are displayed on Backpack.tf */
