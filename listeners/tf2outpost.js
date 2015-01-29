@@ -56,6 +56,8 @@ var INTERNAL_addItemTF2WH = function (item, attrs) {
 				(customNamed ? "Custom names not yet supported" : "No match found.") +
 			"</p>";
 		return asi;
+	} else {
+		return "";
 	}
 }
 
@@ -209,6 +211,8 @@ var INTERNAL_addItemTradeTF = function (item, attrs) {
 		else if (json && json["l"] == "?")
 			errorMsg = "Price is uncertain";
 		return "<p style='color:red'>" + tradetf_favicon + errorMsg + "</p>";
+	} else {
+		return "";
 	}
 }
 

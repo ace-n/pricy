@@ -13,6 +13,7 @@ var callback = function () {
 	$(".checkbox").each(function () {
 		var t = $(this);
 		var c = store.kvGet(t.attr("name"));
+		clog(t.attr("name") + " " + c);
 		if (c && c !== 1) {
 			t.addClass("fa-square-o");
 			t.removeClass("fa-check-square-o");
