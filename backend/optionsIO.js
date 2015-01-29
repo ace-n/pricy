@@ -21,12 +21,12 @@ var Options = {
 
 	/* Specify whether Free or Premium (Ultimate) prices are shown for TF2WH */
 	PRICES_SHOW_ULTIMATE: function (optionsStore) {
-		return false;
+		return optionsStore.kvGet("PRICES_SHOW_ULTIMATE") !== 0;
 	},
 
 	/* Specify whether TF2WH buy/sell prices are shown with "N/A" if stock doesn't allow it */
 	PRICES_SHOW_NA_IF_IMPOSSIBLE: function (optionsStore) {
-		return "TODO";
+		return optionsStore.kvGet("PRICES_SHOW_NA_IF_IMPOSSIBLE") !== 0;
 	},
 
 	/* Specify price display mode
@@ -74,5 +74,4 @@ var Options = {
 
 	/* Specify whether stats are displayed on Trade.tf */
 	/* Specify whether stats are displayed on TF2WH.com */
-	/* Specify whether stats are displayed on Backpack.tf */
 }

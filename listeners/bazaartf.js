@@ -127,8 +127,11 @@ var BazaarTFListener = {
 
 				// Record line info
 				// - Paints
-				else if (Misc.startsWith(line, "Painted: "))
-					parts.push(line.slice(9));
+				else if (Misc.startsWith(line, "Painted: ")) {
+					var paint = line.slice(9);
+					if (name != paint)
+						parts.push(paint);
+				}
 				// - Skip first line (if we're dealing with strange attributes),
 				//   since it's not an additional part
 				else if (isFirstLine) { isFirstLine = false; }

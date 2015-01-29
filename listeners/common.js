@@ -7,9 +7,24 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 		try {
 
 			// Compute prices
-			toggle = (Options.PRICE_CURRENCY_MODE(optionsStore) == 1 ? "c" : "p") + (Options.PRICES_SHOW_ULTIMATE(optionsStore) ? "-u" : "");
+			toggle = Options.PRICE_CURRENCY_MODE(optionsStore) == 1 ? "c" : "p";
 			buyPrice = json["b" + toggle];
-			sellPrice = json["s" + toggle];
+			sellPrice = json["s" + toggle + (Options.PRICES_SHOW_ULTIMATE(optionsStore) ? "-u" : "")];
+
+			// Take stock into account (if necessary)
+			var buyBlocked = "";
+			var sellBlocked = "";
+			if (Options.PRICES_SHOW_NA_IF_IMPOSSIBLE(optionsStore)) {
+				var curStock = json["h"];
+				if (parseInt(json["m"]) <= curStock) {
+					sellPrice = "N/A";
+					sellBlocked = "pricy-stockblocked";
+				}
+				if (curStock < 1) {
+					buyPrice = "N/A";
+					buyBlocked = "pricy-stockblocked";
+				}
+			}
 
 			// Add details to HTML
 			asi = 
@@ -18,9 +33,9 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
 					"<span class='fa fa-inbox' />: " + json["h"] + "/" + json["m"] +
 					"&nbsp;&nbsp;" +
-					"<span class='fa fa-shopping-cart' />: " + buyPrice + 
+						"<span class='fa fa-shopping-cart'/>: " + buyPrice +
 					"&nbsp;&nbsp;" +
-					"<span class='fa fa-dollar' />: " + sellPrice +
+						"<span class='fa fa-dollar'/>: " + sellPrice +
 				"</p>";
 			return asi;
 		}
