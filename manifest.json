@@ -7,14 +7,14 @@
   "version": "0.1",
 
   "background": {
-    "scripts": ["misc.js", "kvStore.js", "optionsIO.js", "query.js", "backgroundPage.js"]
+    "scripts": ["misc.js", "backend/kvStore.js", "backend/optionsIO.js", "backend/query.js", "backend/backgroundPage.js"]
   },
 
   "content_scripts": [
     {
       "matches": ["http://bazaar.tf/*", "http://www.tf2outpost.com/*"],
-      "css": ["fontAwesome/css/font-awesome.min.css"],
-      "js": ["kvStore.js", "misc.js", "constants.js", "optionsIO.js", "query.js"]
+      "css": ["fontAwesome/css/font-awesome.min.css", "listeners/injected.css"],
+      "js": ["backend/kvStore.js", "misc.js", "constants.js", "backend/optionsIO.js", "backend/query.js", "listeners/common.js"]
     },
 
     {
