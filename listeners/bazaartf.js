@@ -15,7 +15,7 @@ var BazaarTFListener = {
 		return "<img class='pricy-favicon pricy-bazaartf' src='" + chrome.extension.getURL(url) + "' /> ";
 	},
 
-		// Initial event interop
+	// Initial event interop
 	InitialInterop: function () {
 		var items = document.getElementsByClassName("item");
 		var item, attrs, i;

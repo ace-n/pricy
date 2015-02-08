@@ -39,7 +39,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 					break;
 			}
 			if (Options.PRICES_STOCK_DISPLAY_MODE(optionsStore) !== 2)
-				stock = "<span class='fa fa-inbox'/>: " + stock + "&nbsp;&nbsp;";
+				stock = "<span class='fa fa-inbox'></span>: " + stock + "&nbsp;&nbsp;";
 
 			// Add details to HTML
 			asi = 

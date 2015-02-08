@@ -19,5 +19,11 @@ var Misc = {
 	startsWith: function(h, n) {
 		var nl = n.length;
 		return nl <= h.length && h.slice(0, nl) === n;
+	},
+
+	// Convert a string to its DOM representation (without the wrapping HTML)
+	parseHTML: function(str) {
+		var wrapped = (new DOMParser()).parseFromString(str, "text/html");
+		return wrapped.childNodes[0].childNodes[1].childNodes[0];
 	}
 }

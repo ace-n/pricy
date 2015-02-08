@@ -1,3 +1,4 @@
+/***** Global stuff *****/
 .pricy-inject {
 	color: white;
 }
@@ -23,4 +24,18 @@
 
 .pricy-stockblocked {
 	color: red;
+}
+
+/**** TF2WH Popup (since they don't have one we can hijack) ****/
+.pricy-tf2wh.pricy-popup {
+	position: relative;
+	background-color: black;
+	border: 3px solid black;
+	padding: 10px;
+	border-radius: 6px;
+	min-width: 135px;
+	z-index: 99;
+}
+.pricy-tf2wh.pricy-popup>p {
+	margin: 0px;
 }

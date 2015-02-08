@@ -12,19 +12,24 @@
 
   "content_scripts": [
     {
-      "matches": ["http://bazaar.tf/*", "http://www.tf2outpost.com/*"],
+      "matches": ["http://bazaar.tf/*", "http://*.tf2outpost.com/*", "http://*.tf2wh.com/*"],
       "css": ["fontAwesome/css/font-awesome.min.css", "listeners/injected.css"],
       "js": ["backend/kvStore.js", "misc.js", "constants.js", "backend/optionsIO.js", "backend/query.js", "listeners/common.js"]
     },
 
     {
-      "matches": ["http://www.tf2outpost.com/*"],
+      "matches": ["http://*.tf2outpost.com/*"],
       "js": ["listeners/tf2outpost.js"]
     },
 
     {
       "matches": ["http://bazaar.tf/*"],
       "js": ["listeners/bazaartf.js"]
+    },
+
+    {
+      "matches": ["http://*.tf2wh.com/*"],
+      "js": ["listeners/tf2wh.js"]
     }
   ],
 
