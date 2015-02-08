@@ -13,9 +13,14 @@ var callback = function () {
 	$(".checkbox").each(function () {
 		var t = $(this);
 		var c = store.kvGet(t.attr("name"));
-		if (c != null && c !== 1) {
-			t.addClass("fa-square-o");
-			t.removeClass("fa-check-square-o");
+		if (c != null) {
+			if (c !== 1) {
+				t.addClass("fa-square-o");
+				t.removeClass("fa-check-square-o");
+			} else {
+				t.addClass("fa-check-square-o");
+				t.removeClass("fa-square-o");
+			}
 		}
 	});
 

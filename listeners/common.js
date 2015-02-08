@@ -26,16 +26,34 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				}
 			}
 
+			// Format stock
+			var stock = "";
+			switch (Options.PRICES_STOCK_DISPLAY_MODE(optionsStore)) {
+				case 2:
+					break; // Every other case should fall through to the default
+				case 1:
+					stock = parseInt(100*parseFloat(json["h"],10)/parseFloat(json["m"],10), 10) + "%";
+					break;
+				case 0:
+					stock = json["h"] + "/" + json["m"];
+					break;
+			}
+			if (Options.PRICES_STOCK_DISPLAY_MODE(optionsStore) !== 2)
+				stock = "<span class='fa fa-inbox'/>: " + stock + "&nbsp;&nbsp;";
+
 			// Add details to HTML
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
 					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
-					"<span class='fa fa-inbox' />: " + json["h"] + "/" + json["m"] +
-					"&nbsp;&nbsp;" +
+					stock + 
+					"<span class='" + buyBlocked + "'>" +
 						"<span class='fa fa-shopping-cart'/>: " + buyPrice +
+					"</span>" +
 					"&nbsp;&nbsp;" +
+					"<span class='" + sellBlocked + "'>" +
 						"<span class='fa fa-dollar'/>: " + sellPrice +
+					"</span>" +
 				"</p>";
 			return asi;
 		}
@@ -128,13 +146,13 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;<span class='fa fa-square-o'></span>&nbsp;&nbsp;" +
 					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) +
 					faIcon;
 			if (showParts) {
 				asi += 
 					"&nbsp;&nbsp;" +
-						"<span class='fa fa-plus-square-o'/>&nbsp;&nbsp;" +
+						"<span class='fa fa-plus-square-o'></span>&nbsp;&nbsp;" +
 						loParts + (loParts == hiParts ? "" : " - " + hiParts) + 
 						faIcon;
 			}

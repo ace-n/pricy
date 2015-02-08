@@ -152,7 +152,7 @@ var BazaarTFListener = {
 		}
 
 		// Query Trade.tf (and throw an exception if query fails)
-		var json = PricyQuery.queryTradeTF(BazaarTFListener.itemsStore, name, craftable, parts, false);
+		var json = PricyQuery.queryTradeTF(BazaarTFListener.itemsStore, name, craftable, false);
 
 		// Common add-item logic
 		return commonAddItemTradeTF(BazaarTFListener.itemsStore, BazaarTFListener.optionsStore, json, BazaarTFListener.tradetf_favicon, customNamed, parts);

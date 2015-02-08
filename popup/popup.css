@@ -7,6 +7,11 @@
 }
 
 /* Entire popup */
+em {
+	font-style: normal;
+	font-weight: bold;
+}
+
 ul {
 	margin-top: 5px;
 	padding-left:20px;

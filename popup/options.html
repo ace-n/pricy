@@ -110,6 +110,23 @@
 			</div>
 
 			<!-- "With parts" handling -->
+			<h2>TF2WH Stock display mode</h2>
+			<div class="rbns">
+				<span>
+					<span class="radio fa fa-circle-o" name="PRICES_STOCK_DISPLAY_MODE" value="2"></span> 
+					hidden
+				</span>
+				<span>
+					<span class="radio fa fa-circle-o" name="PRICES_STOCK_DISPLAY_MODE" value="1"></span>
+					percent
+				</span>
+				<span>
+					<span class="radio fa fa-dot-circle-o" name="PRICES_STOCK_DISPLAY_MODE" value="0"></span> 
+					current/max
+				</span>
+			</div>
+
+			<!-- -->
 			<h2>Addon pricing</h2>
 			If an item has addons, show:
 			<div class="rbns">
@@ -122,7 +139,7 @@
 					item-only price
 				</span>
 				<span>
-					<span class="radio fa fa-circle-o" name="PRICES_PARTS_DISPLAY_MODE" value="2"></span> 
+					<span class="radio fa fa-dot-circle-o" name="PRICES_PARTS_DISPLAY_MODE" value="2"></span> 
 					both
 				</span>
 			</div>
@@ -131,12 +148,12 @@
 			<h2>Misc. (TODO)</h2>
 			<div class="cbxes-block">
 				<span>
-					<span class="checkbox fa fa-square-o" name="todo"></span>
-					Show TF2WH stock information
+					<span class="checkbox fa fa-check-square-o" name="PRICES_SHOW_NA_IF_IMPOSSIBLE"></span>
+					Hide stock-prohibited TF2WH prices
 				</span>
 				<span>
-					<span class="checkbox fa fa-square-o" name="PRICES_SHOW_NA_IF_IMPOSSIBLE"></span>
-					Hide stock-prohibited TF2WH prices
+					<span class="checkbox fa fa-check-square-o" name="ITEMS_SHOW_NORMAL_FAILURES"></span>
+					Hide prices for unknown items
 				</span>
 				<span>
 					<span class="checkbox fa fa-square-o" name="PRICES_SHOW_ULTIMATE"></span>

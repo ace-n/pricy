@@ -115,10 +115,11 @@ var TF2OutpostListener = {
 		}
 
 		// Query Trade.tf (and throw an exception if query fails)
-		var json = PricyQuery.queryTradeTF(TF2OutpostListener.itemsStore, name, craftable, parts, false);
+		var json = PricyQuery.queryTradeTF(TF2OutpostListener.itemsStore, name, craftable, false);
+console.log(TF2OutpostListener.itemsStore)
 
 		// Common add-item logic
-		return commonAddItemTradeTF(TF2OutpostListener.optionsStore, json, TF2OutpostListener.tradetf_favicon, false);
+		return commonAddItemTradeTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.tradetf_favicon, false, parts);
 	},
 
 	// Master item adding helper function

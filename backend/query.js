@@ -55,7 +55,7 @@ var PricyQuery = {
 		var callback = callbackF;
 		var rows = rowsF;
 		req.open("GET", url, true);
-		req.onload = function (resp) { callback(store, rows(req.response)); };
+		req.onload = function () { callback(store, rows(req.response)); };
 
 		// Send XHR
 		req.send(null);
@@ -168,9 +168,6 @@ var PricyQuery = {
 			store.kvSet("trd_Scrap Metal", {"l": 0.11, "h": 0.11, "u":"Refined Metal", "uh": "gear"});
 			store.kvSet("trd_Reclaimed Metal", {"l": 0.33, "h": 0.33, "u":"Refined Metal", "uh": "gear"});
 			store.kvSet("trd_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"});
-			// Items that are (incorrectly) listed as both craftable and non-craftable on Trade.tf
-			store.kvSet("trd_Tour of Duty Ticket", null);
-			store.kvSet("trd_Squad Surplus Voucher", null);
 
 			// Save kvStore (since a lot of things have just been updated)
 			store.kvSet("trd-querying", "0");

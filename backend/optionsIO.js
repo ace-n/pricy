@@ -6,7 +6,16 @@ var Options = {
 
 	/* Specify whether 'normal failures' are shown */
 	ITEMS_SHOW_NORMAL_FAILURES: function (optionsStore) {
-		return false;
+		return optionsStore.kvGet("PRICES_SHOW_NORMAL_FAILURES") != 1;
+	},
+
+	/* Specify how TF2WH stock info is displayed
+	 * - 0 = Display stock info as current/max
+	 * - 1 = Display stock info as a percentage
+	 * - 2 = Don't display stock info
+	 */
+	PRICES_STOCK_DISPLAY_MODE: function (optionsStore) {
+		return parseInt(optionsStore.kvGet("PRICES_STOCK_DISPLAY_MODE"),10) || 0;
 	},
 
 	/* Specify whether Trade.tf "with parts" prices are displayed 
@@ -15,18 +24,17 @@ var Options = {
 	 * - 2 = Display both prices
 	*/
 	PRICES_PARTS_DISPLAY_MODE: function (optionsStore) {
-		console.log(parseInt(optionsStore.kvGet("PRICES_PARTS_DISPLAY_MODE"), 10));
 		return parseInt(optionsStore.kvGet("PRICES_PARTS_DISPLAY_MODE"), 10) || 2;
 	},
 
 	/* Specify whether Free or Premium (Ultimate) prices are shown for TF2WH */
 	PRICES_SHOW_ULTIMATE: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_ULTIMATE") !== 0;
+		return optionsStore.kvGet("PRICES_SHOW_ULTIMATE") === 1;
 	},
 
 	/* Specify whether TF2WH buy/sell prices are shown with "N/A" if stock doesn't allow it */
 	PRICES_SHOW_NA_IF_IMPOSSIBLE: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_NA_IF_IMPOSSIBLE") !== 0;
+		return optionsStore.kvGet("PRICES_SHOW_NA_IF_IMPOSSIBLE") != 0;
 	},
 
 	/* Specify price display mode
@@ -40,12 +48,12 @@ var Options = {
 	/******************************************************/
 	/* Specify whether TF2WH stats are displayed */
 	PRICES_SHOW_TF2WH: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_TF2WH") !== 0;
+		return optionsStore.kvGet("PRICES_SHOW_TF2WH") != 0;
 	},
 
 	/* Specify whether Trade.tf stats are displayed */
 	PRICES_SHOW_TRADETF: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_TRADETF") !== 0;
+		return optionsStore.kvGet("PRICES_SHOW_TRADETF") != 0;
 	},
 
 	/* Specify whether Backpack.tf stats are displayed */
@@ -64,12 +72,12 @@ var Options = {
 	/******************************************************/
 	/* Specify whether stats are displayed on Bazaar.tf */
 	PRICES_SHOW_ON_BAZAAR: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_ON_BAZAAR") !== 0;
+		return optionsStore.kvGet("PRICES_SHOW_ON_BAZAAR") != 0;
 	},
 
 	/* Specify whether stats are displayed on TF2Outpost.com */
 	PRICES_SHOW_ON_TF2OP: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_ON_TF2OP") !== 0;
+		return optionsStore.kvGet("PRICES_SHOW_ON_TF2OP") != 0;
 	}
 
 	/* Specify whether stats are displayed on Trade.tf */
