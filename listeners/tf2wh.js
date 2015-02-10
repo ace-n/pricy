@@ -113,7 +113,7 @@ var TF2WHListener = {
 					content = "<p>" + TF2WHListener.wh_favicon + ex + "</p>";
 				}
 				if (content.indexOf("pricy-error") !== -1 || content == "")
-					content = "<p>" + TF2WHListener.wh_favicon + "&nbsp;&nbsp;" + newTitle + "</p>";
+					content = "<p>" + TF2WHListener.wh_favicon + "&nbsp;" + newTitle + "</p>";
 				popup.appendChild(Misc.parseHTML(content));
 			}
 
@@ -124,7 +124,7 @@ var TF2WHListener = {
 					content = TF2WHListener.INTERNAL_addItemTradeTF(item, attrs);
 				}
 				catch (ex) {
-					content += "<p>" + TF2WHListener.tradetf_favicon + ex + "</p>";
+					content += "<p class='pricy-inject'>" + TF2WHListener.tradetf_favicon + ex + "</p>";
 				}
 				if (content != "")
 					popup.appendChild(Misc.parseHTML(content));

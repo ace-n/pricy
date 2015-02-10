@@ -36,7 +36,7 @@
 	display: inline-block;
 	padding: 10px;
 	position: relative;
-	left: calc(-50% - 106px);
+	left: calc(-50% - 105px);
 	width: 450px;
 	z-index: 99;
 }

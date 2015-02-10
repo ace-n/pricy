@@ -45,14 +45,14 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;<span class='fa fa-square-o'></span>&nbsp;&nbsp;" +
 					stock + 
 					"<span class='" + buyBlocked + "'>" +
-						"<span class='fa fa-shopping-cart'/>: " + buyPrice +
+						"<span class='fa fa-shopping-cart'></span>: " + buyPrice +
 					"</span>" +
 					"&nbsp;&nbsp;" +
 					"<span class='" + sellBlocked + "'>" +
-						"<span class='fa fa-dollar'/>: " + sellPrice +
+						"<span class='fa fa-dollar'></span>: " + sellPrice +
 					"</span>" +
 				"</p>";
 			return asi;
