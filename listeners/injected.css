@@ -22,20 +22,51 @@
 	left:5px;
 }
 
+.pricy-favicon.pricy-tf2wh {
+	top:6px;
+	left:2px;
+}
+
 .pricy-stockblocked {
 	color: red;
 }
 
 /**** TF2WH Popup (since they don't have one we can hijack) ****/
 .pricy-tf2wh.pricy-popup {
-	position: relative;
-	background-color: black;
-	border: 3px solid black;
+	display: inline-block;
 	padding: 10px;
-	border-radius: 6px;
-	min-width: 135px;
+	position: relative;
+	left: calc(-50% - 106px);
+	width: 450px;
 	z-index: 99;
 }
-.pricy-tf2wh.pricy-popup>p {
+
+.pricy-tf2wh.pricy-popup > div {
+	display: none;
+	background-color: black;
+	border: 3px solid black;
+	border-radius: 6px;
+	padding:5px 10px 10px 10px;
+}
+
+.pricy-tf2wh.pricy-popup > div > p {
 	margin: 0px;
+	white-space: nowrap;
+}
+
+.entry:hover > .pricy-tf2wh.pricy-popup > div {
+	display: inline-table;
+}
+
+/* Hacking TF2WH's UI to match Bazaar.tf's */
+i.itempricesmall,
+.entry > span {
+	display: none;
+}
+div.entry {
+	height: 124px !important;
+}
+p.pricy-tf2wh-header {
+	font-size: 18px !important;
+	padding: 5px 0 2px 0;
 }

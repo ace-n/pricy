@@ -6,7 +6,7 @@ var Options = {
 
 	/* Specify whether 'normal failures' are shown */
 	ITEMS_SHOW_NORMAL_FAILURES: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_NORMAL_FAILURES") != 1;
+		return optionsStore.kvGet("ITEMS_SHOW_NORMAL_FAILURES") !== 0;
 	},
 
 	/* Specify how TF2WH stock info is displayed

@@ -89,21 +89,31 @@ var TF2WHListener = {
 
 			// Get data
 			var popup = document.createElement("div");
-			popup.className = "pricy-tf2wh pricy-popup";
-			//console.log(popup);
+			var href = item.getElementsByTagName("a")[0];
+
+			// Suppress tooltip
+			var newTitle = href.attributes["title"].value;
+			newTitle = newTitle.slice(newTitle.indexOf(",") + 1).replace(/,/g, "");
+			href.setAttribute("title", "");
+
+			// Header
+			var header = document.createElement("p");
+			try { header.style.color = href.style.borderColor; } catch (ex) { header.style.color = "#7D6D00"; }
+			header.className = "pricy-tf2wh-header";
+			header.textContent = attrs["name"].value;
+			popup.appendChild(header);
 
 			// Query TF2WH
-			var tryingLater = false;
 			var content = "";
 			if (Options.PRICES_SHOW_TF2WH(TF2WHListener.optionsStore)) {
 				try {
 					content = TF2WHListener.INTERNAL_addItemTF2WH(item, attrs);
 				}
 				catch (ex) {
-					setTimeout(function(newDetails) { ael(item, attrs); }, 250);
-					tryingLater = true;
 					content = "<p>" + TF2WHListener.wh_favicon + ex + "</p>";
 				}
+				if (content.indexOf("pricy-error") !== -1 || content == "")
+					content = "<p>" + TF2WHListener.wh_favicon + "&nbsp;&nbsp;" + newTitle + "</p>";
 				popup.appendChild(Misc.parseHTML(content));
 			}
 
@@ -114,23 +124,17 @@ var TF2WHListener = {
 					content = TF2WHListener.INTERNAL_addItemTradeTF(item, attrs);
 				}
 				catch (ex) {
-					if (!tryingLater) {
-						setTimeout(function(newDetails) { ael(item, attrs); }, 250);
-					}
-					tryingLater = true;
 					content += "<p>" + TF2WHListener.tradetf_favicon + ex + "</p>";
 				}
-				popup.appendChild(Misc.parseHTML(content));
+				if (content != "")
+					popup.appendChild(Misc.parseHTML(content));
 			}
 
 			// Add popup
-			item.appendChild(popup);
-
-			// Show popup
-			item.addEventListener("mouseover", function() { 
-
-
-			});
+			var container = document.createElement("div");
+			container.className = "pricy-tf2wh pricy-popup";
+			container.appendChild(popup)
+			item.appendChild(container);
 		};
 		ael(item, attrs);
 	}

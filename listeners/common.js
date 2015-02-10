@@ -61,6 +61,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 			return "<p class='pricy-inject pricy-error'>Error: " + ex + "</p>";
 		}
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
+		console.log(Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore));
 		asi = 
 			"<p class='pricy-inject pricy-error'>" +
 				favicon + "&nbsp;&nbsp;" +
@@ -173,7 +174,7 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			errorMsg = "Custom names not yet supported";
 		else if (json && json["l"] == "?")
 			errorMsg = "Price is uncertain";
-		return "<p class='pricy-inject pricy-error'>" + favicon + errorMsg + "</p>";
+		return "<p class='pricy-inject pricy-error'>" + favicon  + "&nbsp;&nbsp;" + errorMsg + "</p>";
 	} else {
 		return "";
 	}
