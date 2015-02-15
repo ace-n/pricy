@@ -12,6 +12,9 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 			case "trdTf":
 				PricyQuery.updateTradeTF(itemsStore);
 				break;
+			case "bpTf":
+				PricyQuery.updateBPTF(itemsStore);
+				break;
 			default:
 				throw "Invalid alarm name";
 		};
@@ -24,6 +27,9 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 				break;
 			case "trdTf":
 				period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
+				break;
+			case "bpTf":
+				period = Options.UPDATE_BPTF_FREQUENCY(optionsStore);
 				break;
 			default:
 				throw "Invalid alarm name";
@@ -45,7 +51,7 @@ var intermediate = function() {
 		// Initial alarm triggers
 		chrome.alarms.create("tf2wh", {"when": Date.now() + 500});
 		chrome.alarms.create("trdTf", {"when": Date.now() + 1000});
-		//chrome.alarms.create("bpTf",  {"when": Date.now() + 1500});
+		chrome.alarms.create("bpTf",  {"when": Date.now() + 1500});
 	};
 
 	// Level 2 kvStore request

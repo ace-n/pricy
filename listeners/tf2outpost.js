@@ -116,10 +116,26 @@ var TF2OutpostListener = {
 
 		// Query Trade.tf (and throw an exception if query fails)
 		var json = PricyQuery.queryTradeTF(TF2OutpostListener.itemsStore, name, craftable, false);
-console.log(TF2OutpostListener.itemsStore)
 
 		// Common add-item logic
 		return commonAddItemTradeTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.tradetf_favicon, false, parts);
+	},
+
+	// TF2WH item adding helper function
+	INTERNAL_addItemBPTF: function (item, attrs) {
+		
+		// Get data
+		var name = (attrs["data-real-name"] || attrs["data-name"]).value;
+		var craftable = true;
+		var flags = attrs["data-flags"];
+		if (flags)
+			craftable = (flags.value.indexOf("(Not Craftable)") === -1);
+
+		// Query TF2WH (and throw an exception if query fails)
+		var json = PricyQuery.queryBPTF(TF2OutpostListener.itemsStore, name, craftable);
+		
+		// Common add-item logic
+		return commonAddItemBPTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.tradetf_favicon, false);
 	},
 
 	// Master item adding helper function
@@ -145,7 +161,6 @@ console.log(TF2OutpostListener.itemsStore)
 				newDetails = "";
 
 			// Query TF2WH
-			var tryingLater = false;
 			if (Options.PRICES_SHOW_TF2WH(TF2OutpostListener.optionsStore)) {
 				try {
 					newDetails += TF2OutpostListener.INTERNAL_addItemTF2WH(item, attrs);
@@ -153,8 +168,6 @@ console.log(TF2OutpostListener.itemsStore)
 				catch (ex) {
 					if (ex !== "Item not found.") {
 						console.log(ex);
-						tryingLater = true;
-						setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
 						newDetails += "<p>" + TF2OutpostListener.wh_favicon + "&nbsp;" + ex + "</p>";
 					}
 				}
@@ -168,10 +181,19 @@ console.log(TF2OutpostListener.itemsStore)
 				catch (ex) {
 					if (ex !== "Item not found.") {
 						console.log(ex);
-						if (!tryingLater) {
-							setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
-						}
-						tryingLater = true;
+						newDetails += "<p>" + TF2OutpostListener.tradetf_favicon + "&nbsp;" + ex + "</p>";
+					}
+				}
+			}
+
+			// Query Backpack.tf
+			if (Options.PRICES_SHOW_BPTF(TF2OutpostListener.optionsStore)) {
+				try {
+					newDetails += TF2OutpostListener.INTERNAL_addItemBPTF(item, attrs);
+				}
+				catch (ex) {
+					if (ex !== "Item not found.") {
+						console.log(ex);
 						newDetails += "<p>" + TF2OutpostListener.tradetf_favicon + "&nbsp;" + ex + "</p>";
 					}
 				}

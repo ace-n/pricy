@@ -33,26 +33,24 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 					break; // Every other case should fall through to the default
 				case 1:
 					stock = parseInt(100*parseFloat(json["h"],10)/parseFloat(json["m"],10), 10) + "%";
-					break;
 				case 0:
 					stock = json["h"] + "/" + json["m"];
-					break;
+				default:
+					stock = "<span class='fa fa-inbox'/>: " + stock + "&nbsp;&nbsp;";
 			}
-			if (Options.PRICES_STOCK_DISPLAY_MODE(optionsStore) !== 2)
-				stock = "<span class='fa fa-inbox'></span>: " + stock + "&nbsp;&nbsp;";
 
 			// Add details to HTML
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;<span class='fa fa-square-o'></span>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
 					stock + 
 					"<span class='" + buyBlocked + "'>" +
-						"<span class='fa fa-shopping-cart'></span>: " + buyPrice +
+						"<span class='fa fa-shopping-cart'/>: " + buyPrice +
 					"</span>" +
 					"&nbsp;&nbsp;" +
 					"<span class='" + sellBlocked + "'>" +
-						"<span class='fa fa-dollar'></span>: " + sellPrice +
+						"<span class='fa fa-dollar'/>: " + sellPrice +
 					"</span>" +
 				"</p>";
 			return asi;
@@ -61,7 +59,6 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 			return "<p class='pricy-inject pricy-error'>Error: " + ex + "</p>";
 		}
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
-		console.log(Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore));
 		asi = 
 			"<p class='pricy-inject pricy-error'>" +
 				favicon + "&nbsp;&nbsp;" +
@@ -73,6 +70,64 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 	}
 
 };
+
+var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, customNamed) {
+
+	var asi; // "Automatic semicolon insertion" = return statements must be one liners
+	var showParts, i, pJson, loCur, hiCur, keyRefRatio, unitRatio; // Other loop vars
+	keyRefRatio = null;
+	if (json && json["l"] !== "?") {
+		try {
+
+			// Init variables
+			var lo = json["l"];
+			var hi = json["h"];
+
+			// Convert lo/hi prices to appropriate units
+			if (Options.PRICE_CURRENCY_MODE(optionsStore) === 0) {
+				try {
+					unitRatio = PricyQuery.queryTF2WH(itemsStore, json["u"], true)["bp"];
+				} catch (ex) {
+					return "<p class='pricy-inject pricy-error'>" + favicon + " TF2WH error: " + ex + "</p>";
+				}
+				lo = (lo * unitRatio).toFixed();
+				hi = (hi * unitRatio).toFixed();
+			} else {
+				lo = Misc.centify(lo);
+				hi = Misc.centify(hi);
+			}
+
+			// Add details to HTML
+			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
+			asi = 
+				"<p class='pricy-inject'>" +
+					favicon +
+					"&nbsp;&nbsp;<span class='fa fa-square-o'></span>&nbsp;&nbsp;" +
+					lo + (lo == hi ? "" : " - " + hi) +
+					faIcon;
+			asi += "</p>"
+
+			// Done!
+			return asi;
+		}
+		catch (ex) {
+			console.log(ex);
+			return "<p class='pricy-inject pricy-error'>Error: " + ex + "</p>";
+		}
+	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
+
+		// Return error message
+		var errorMsg = "No match found";
+		if (customNamed)
+			errorMsg = "Custom names not yet supported";
+		else if (json && json["l"] == "?")
+			errorMsg = "Price is uncertain";
+		return "<p class='pricy-inject pricy-error'>" + favicon + errorMsg + "</p>";
+	} else {
+		return "";
+	}
+};
+
 
 var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, customNamed, parts) {
 
@@ -174,7 +229,7 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			errorMsg = "Custom names not yet supported";
 		else if (json && json["l"] == "?")
 			errorMsg = "Price is uncertain";
-		return "<p class='pricy-inject pricy-error'>" + favicon  + "&nbsp;&nbsp;" + errorMsg + "</p>";
+		return "<p class='pricy-inject pricy-error'>" + favicon + errorMsg + "</p>";
 	} else {
 		return "";
 	}

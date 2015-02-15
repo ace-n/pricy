@@ -1,7 +1,7 @@
 var PricyQuery = {
 
 	/* Normalize query names */
-	normalizeName: function(name, removeThe) {
+	normalizeName: function(store, name, removeThe) {
 
 		// TODO: Organize list below from most common to most rare
 		// TODO: Bail out of name replacement loop when name changes
@@ -9,22 +9,22 @@ var PricyQuery = {
 		// Convert strange types (eg. "Face-melting") to "Strange"
 		var types = [
 			// Original types        Invis watch types           Cosmetic types
-			"Unremarkable ",         "Scarcely Shocking ",       "Ragged",
-			"Scarcely Lethal ",      "Mildly Magnetizing ",      "Tacky",
-			"Mildly Menacing ",      "Somewhat Inducting ",      "Secondhand",
-			"Somewhat Threatening ", "Unfortunate ",             "Odious",
-			"Uncharitable ",         "Notably Deleterious ",     "Garish",
-			"Notably Dangerous ",    "Sufficiently Ruinous ",    "Comfortable",
-			"Sufficiently Lethal ",  "Truly Conducting ",        "Dapper",
-			"Truly Feared ",         "Spectacularly Pseudoful ", "Sharp",
-			"Spectacularly Lethal ", "Ion-Spattered ",           "Fancy",
-			"Gore-Spattered ",       "Wickedly Dynamizing ",     "Fancy Shmancy",
-			"Wicked Nasty ",         "Positively Plasmatic ",    "Fashionable",
-			"Positively Inhumane ",  "Circuit-Melting ",         "Glamorous",
-			"Totally Ordinary ",     "Nullity-Inducing ",        "Posh",
-			"Face-Melting ",         "Mann Co. Select ",         "Fabulous",
-			"Rage-Inducing ",                                    "Stunning",
-			"Server-Clearing ",                                  "Mannceaux Signature Collection",
+			"Unremarkable ",         "Scarcely Shocking ",       "Ragged ",
+			"Scarcely Lethal ",      "Mildly Magnetizing ",      "Tacky ",
+			"Mildly Menacing ",      "Somewhat Inducting ",      "Secondhand ",
+			"Somewhat Threatening ", "Unfortunate ",             "Odious ",
+			"Uncharitable ",         "Notably Deleterious ",     "Garish ",
+			"Notably Dangerous ",    "Sufficiently Ruinous ",    "Comfortable ",
+			"Sufficiently Lethal ",  "Truly Conducting ",        "Dapper ",
+			"Truly Feared ",         "Spectacularly Pseudoful ", "Sharp ",
+			"Spectacularly Lethal ", "Ion-Spattered ",           "Fancy ",
+			"Gore-Spattered ",       "Wickedly Dynamizing ",     "Fancy Shmancy ",
+			"Wicked Nasty ",         "Positively Plasmatic ",    "Fashionable ",
+			"Positively Inhumane ",  "Circuit-Melting ",         "Glamorous ",
+			"Totally Ordinary ",     "Nullity-Inducing ",        "Posh ",
+			"Face-Melting ",         "Mann Co. Select ",         "Fabulous ",
+			"Rage-Inducing ",                                    "Stunning ",
+			"Server-Clearing ",                                  "Mannceaux Signature Collection ",
 			"Epic ",
 			"Legendary ",
 			"Australian ",
@@ -34,7 +34,10 @@ var PricyQuery = {
 		for (i=0; i<types.length; i++) {
 			t = types[i];
 			if (Misc.startsWith(name, t)) {
-				name = "Strange " + name.slice(t.length);
+
+				// Replace name iff. item is actually strange
+				if (PricyQuery.queryExists(store, name.slice(t.length)))
+					name = "Strange " + name.slice(t.length);
 				break;
 			}
 		}
@@ -61,28 +64,33 @@ var PricyQuery = {
 		req.send(null);
 	},
 
-	/* Query backpack.tf */
-	queryBackpackTF: function (store, name) {
+	/* Query caches to determine if an item exists */
+	// DOES NOT NORMALIZE NAMES! (Since this is used in normalizeName())
+	queryExists: function(store, name) {
 
-		// Grab from cache
-		name = PricyQuery.normalizeName(name, false);
-		var cached = store.kvGet(name + "_bptf");
-		if (cached)
-			return cached;
+		// Check if item exists in cache
+		var prefixes = ["bp_", "trd_", "wh_"];
+		for (var i=0; i<prefixes.length; i++) {
+			if (store.kvGet(prefixes[i] + name))
+				return true;
+		}
+
+		// Item doesn't exist in cache
+		return false;
 	},
 
 	/* Query the trade.tf cache for an individual item */
 	queryTradeTF: function (store, name, craftable, asPart) {
 
 		// Normalize name
-		name = PricyQuery.normalizeName(name, true);
+		name = PricyQuery.normalizeName(store, name, true);
 
 		// Fetch data from cache
 		return store.kvGet("trd_" + (asPart ? "AddonPart " : "") + (craftable ? "" : "Uncraftable ") + name);
 	},
 
-	// Trade.tf helper function
-	updateItemTradeTF: function (store, name, quality, elem, childIdx) {
+	// Trade.tf/Backpack.tf helper function
+	updateItemHelper: function (prefix, store, name, quality, elem, childIdx) {
 		var obj = {};
 		if (elem) {
 			var child = elem.children[childIdx];
@@ -90,7 +98,7 @@ var PricyQuery = {
 
 				var price = child.innerText.trim(); // "?" marks the price as 'existing'
 				var json = {};
-				if (price) {
+				if (price && price !== "n/a") {
 
 					// Convert raw price into parseable JSON
 					var priceBounds = price.match(new RegExp("(\\d|\\.)+", "gm"));
@@ -123,7 +131,7 @@ var PricyQuery = {
 				}
 
 				// Store JSON in memory
-				store.kvSet("trd_" + (quality ? quality + " " : "") + name, json);
+				store.kvSet(prefix + (quality ? quality + " " : "") + name, json);
 			}
 		}
 	},
@@ -153,15 +161,15 @@ var PricyQuery = {
 				// Update cached values
 				json = {};
 				cols = rows[i].getElementsByTagName("td");
-				name = PricyQuery.normalizeName(name, true);
-				PricyQuery.updateItemTradeTF(store, name, "", cols[1], 0);
+				name = PricyQuery.normalizeName(store, name, true);
+				PricyQuery.updateItemHelper("trd_", store, name, "", cols[1], 0);
 				if (bwe_idx != -1)
-					PricyQuery.updateItemTradeTF(store, name, "AddonPart", cols[1], 2);
-				PricyQuery.updateItemTradeTF(store, name, "Uncraftable", cols[2], 0);
-				PricyQuery.updateItemTradeTF(store, name, "Vintage", cols[3], 0);
-				PricyQuery.updateItemTradeTF(store, name, "Genuine", cols[4], 0);
-				PricyQuery.updateItemTradeTF(store, name, "Strange", cols[5], 0);
-				PricyQuery.updateItemTradeTF(store, name, "Haunted", cols[6], 0);
+					PricyQuery.updateItemHelper("trd_", store, name, "AddonPart", cols[1], 2);
+				PricyQuery.updateItemHelper("trd_", store, name, "Uncraftable", cols[2], 0);
+				PricyQuery.updateItemHelper("trd_", store, name, "Vintage", cols[3], 0);
+				PricyQuery.updateItemHelper("trd_", store, name, "Genuine", cols[4], 0);
+				PricyQuery.updateItemHelper("trd_", store, name, "Strange", cols[5], 0);
+				PricyQuery.updateItemHelper("trd_", store, name, "Haunted", cols[6], 0);
 			}
 
 			// Reset hardcoded items
@@ -183,7 +191,7 @@ var PricyQuery = {
 	queryTF2WH: function (store, name, craftable) {
 
 		// Normalize name
-		name = PricyQuery.normalizeName(name, true);
+		name = PricyQuery.normalizeName(store, name, true);
 		name = name.replace(new RegExp("^Strange (?=.?Part:)"), "");
 
 		// Handle uncraftable items
@@ -191,10 +199,10 @@ var PricyQuery = {
 
 			// Check craftability states
 			var variants = 0;
-			if (PricyQuery.queryTradeTF(store, name, true, false)) {
+			if (PricyQuery.queryTradeTF(store, name, true, false) || PricyQuery.queryBPTF(store, name, true)) {
 				variants++;
 			}
-			if (PricyQuery.queryTradeTF(store, name, false, false)) {
+			if (PricyQuery.queryTradeTF(store, name, false, false) || PricyQuery.queryBPTF(store, name, true)) {
 				variants++;
 			}
 
@@ -261,10 +269,11 @@ var PricyQuery = {
 
 				/**************** Build + store JSON ****************/
 				// Build JSON
+				// N.B: This procedure is different than
 				i_toJson = {"bp": i_buyPrice, "bc": i_buyConv, "sp": i_sellPrice, "sc": i_sellConv, "sp-u": i_sellPrice_u, "sc-u": i_sellConv_u, "h": i_stock_cur, "m": i_stock_max};
 
 				// Cache JSON
-				store.kvSet("wh_" + PricyQuery.normalizeName(i_name, true), i_toJson);
+				store.kvSet("wh_" + PricyQuery.normalizeName(store, i_name, true), i_toJson);
 			}; 
 
 			// Save kvStore (since a lot of things have just been updated)
@@ -275,5 +284,58 @@ var PricyQuery = {
 			console.log("[Pricy] TF2WH query complete!");
 		};
 		PricyQuery.xhrQuery(store, "http://www.tf2wh.com/priceguide", "wh", rowFunc, callback);
+	},
+
+	/* Query the Backpack.tf cache for an individual item */
+	queryBPTF: function (store, name, craftable) {
+
+		// Normalize name
+		name = PricyQuery.normalizeName(store, name, true);
+
+		// Fetch data from cache
+		return store.kvGet("bp_" + (craftable ? "" : "Uncraftable ") + name);
+	},
+
+	// Actually query Backpack.tf itself - SHOULD ONLY BE CALLED FROM BACKGROUND PAGE
+	updateBPTF: function (store) {
+		rowFunc = function (response) {
+			var dp = new DOMParser();
+			var dom = dp.parseFromString(response, "text/html");
+			return dom.getElementById("pricelist").getElementsByTagName("tr");
+		};
+		callback = function (store, rows) {
+			var prefixes = ["Genuine ", "Vintage ", "", "Strange ", "Haunted ", "Collector's "];
+			for (var i=1; i < rows.length; i++) {
+
+				// Get values
+				var name = rows[i].childNodes[0].innerText;
+
+				// Ignore hardcoded items
+				if (name === "Refined Metal")
+					continue;
+
+				// Set values (special case: uncraftable items)
+				if (name.indexOf("(Non-Craftable)") !== -1)
+					PricyQuery.updateItemHelper("bp_", store, name, "Uncraftable", rows[i], 4);
+
+				// Set values (normal case: craftable items)
+				else {
+					for (var j = 2; j < 8; j++) {
+						PricyQuery.updateItemHelper("bp_", store, name, prefixes[j-2], rows[i], j);
+					}
+				}
+			}
+
+			// Reset hardcoded items
+			store.kvSet("bp_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"});
+
+			// Save kvStore (since a lot of things have just been updated)
+			store.kvSet("bp-querying", "0");
+			store.kvSave();
+			
+			// Done!
+			console.log("[Pricy] Backpack.tf query complete!");
+		};
+		PricyQuery.xhrQuery(store, "http://backpack.tf/pricelist/spreadsheet", "bp", rowFunc, callback);
 	}
 };

@@ -57,6 +57,9 @@ var Options = {
 	},
 
 	/* Specify whether Backpack.tf stats are displayed */
+	PRICES_SHOW_BPTF: function (optionsStore) {
+		return optionsStore.kvGet("PRICES_SHOW_BPTF") != 0;
+	},
 
 	/******************************************************/
 	/* Specify TF2WH update frequency (in minutes) */
@@ -66,6 +69,11 @@ var Options = {
 
 	/* Specify Trade.tf update frequency (in minutes) */
 	UPDATE_TRADETF_FREQUENCY: function (optionsStore) {
+		return 15;
+	},
+
+	/* Specify Backpack.tf update frequency (in minutes) */
+	UPDATE_BPTF_FREQUENCY: function (optionsStore) {
 		return 15;
 	},
 
@@ -84,6 +92,7 @@ var Options = {
 
 	/* Specify whether stats are displayed on TF2WH.com */
 	PRICES_SHOW_ON_TF2WH: function (optionsStore) {
-		return optionsStore.kvGet("PRICES_SHOW_ON_TF2WH") != 0;
+		// Not finished, so it's disabled
+		return false; // optionsStore.kvGet("PRICES_SHOW_ON_TF2WH") != 0;
 	}
 }

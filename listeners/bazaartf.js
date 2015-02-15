@@ -185,14 +185,11 @@ var BazaarTFListener = {
 				newDetails = "";
 
 			// Query TF2WH
-			var tryingLater = false;
 			if (Options.PRICES_SHOW_TF2WH(BazaarTFListener.optionsStore)) {
 				try {
 					newDetails += BazaarTFListener.INTERNAL_addItemTF2WH(item, attrs);
 				}
 				catch (ex) {
-					tryingLater = true;
-					setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
 					newDetails += "<p>" + wh_favicon + ex + "</p>";
 				}
 			}
@@ -203,10 +200,6 @@ var BazaarTFListener = {
 					newDetails += BazaarTFListener.INTERNAL_addItemTradeTF(item, attrs)
 				}
 				catch (ex) {
-					if (!tryingLater) {
-						setTimeout(function(newDetails) { ael(item, attrs, origDetails); }, 250);
-					}
-					tryingLater = true;
 					newDetails += "<p>" + BazaarTFListener.tradetf_favicon + ex + "</p>";
 				}
 			}
