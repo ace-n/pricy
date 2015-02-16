@@ -1,9 +1,9 @@
 var Misc = {
 	// Convert floats to 2-digit decimals and remove trailing zeroes
 	centify: function (f) {
-		f = f.toFixed(2);
+		f = f.toFixed(2).toString();
 		for (var i = f.length - 1; f[i] === "0"; i--) {}
-		return f[i] === "." ? f.slice(0, i) : f;
+		return f.slice(0, f[i] === "." ? i : i+1);
 	},
 
 	// Replace a needle at the front of a string with another string

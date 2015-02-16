@@ -9,6 +9,7 @@ var TF2OutpostListener = {
 	// Favicon URLs
 	wh_favicon: null,
 	tradetf_favicon: null,
+	bptf_favicon: null,
 
 	// Helper function
 	favify: function(url) {
@@ -135,7 +136,7 @@ var TF2OutpostListener = {
 		var json = PricyQuery.queryBPTF(TF2OutpostListener.itemsStore, name, craftable);
 		
 		// Common add-item logic
-		return commonAddItemBPTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.tradetf_favicon, false);
+		return commonAddItemBPTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.bptf_favicon, false);
 	},
 
 	// Master item adding helper function
@@ -194,13 +195,13 @@ var TF2OutpostListener = {
 				catch (ex) {
 					if (ex !== "Item not found.") {
 						console.log(ex);
-						newDetails += "<p>" + TF2OutpostListener.tradetf_favicon + "&nbsp;" + ex + "</p>";
+						newDetails += "<p>" + TF2OutpostListener.bptf_favicon + "&nbsp;" + ex + "</p>";
 					}
 				}
 			}
 
 			if (newDetails) {
-				item.setAttribute("data-subtitle", newDetails);
+				item.setAttribute("data-subtitle", "<div class='pricy-container'>" + newDetails + "</div>");
 			}
 		};
 		ael(item, attrs, attrs['data-subtitle'].value);
@@ -213,6 +214,7 @@ TF2OutpostListener.loadTime = Date.now();
 // Init favicon URLs
 TF2OutpostListener.wh_favicon = TF2OutpostListener.favify('/icons/wh.ico'),
 TF2OutpostListener.tradetf_favicon = TF2OutpostListener.favify('/icons/tradetf.ico'),
+TF2OutpostListener.bptf_favicon = TF2OutpostListener.favify('/icons/bptf.ico'),
 
 // Init kvStores + Level 1 callbacks
 TF2OutpostListener.itemsStore = new kvStore("pricyItems", TF2OutpostListener.intermediate, false);

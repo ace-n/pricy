@@ -31,6 +31,14 @@
 	color: red;
 }
 
+div.pricy-container {
+	display: block;
+	width: inherit;
+}
+
+.pricy-inject {
+}
+
 /**** TF2WH Popup (since they don't have one we can hijack) ****/
 .pricy-tf2wh.pricy-popup {
 	display: inline-block;

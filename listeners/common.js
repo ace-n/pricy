@@ -117,12 +117,12 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
 
 		// Return error message
-		var errorMsg = "No match found";
+		var errorMsg = "No match found.";
 		if (customNamed)
-			errorMsg = "Custom names not yet supported";
+			errorMsg = "Custom names not yet supported.";
 		else if (json && json["l"] == "?")
-			errorMsg = "Price is uncertain";
-		return "<p class='pricy-inject pricy-error'>" + favicon + errorMsg + "</p>";
+			errorMsg = "Price is uncertain.";
+		return "<p class='pricy-inject pricy-error'>" + favicon + "&nbsp;&nbsp;" + errorMsg + "</p>";
 	} else {
 		return "";
 	}
@@ -224,12 +224,12 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
 
 		// Return error message
-		var errorMsg = "No match found";
+		var errorMsg = "No match found.";
 		if (customNamed)
-			errorMsg = "Custom names not yet supported";
+			errorMsg = "Custom names not yet supported.";
 		else if (json && json["l"] == "?")
-			errorMsg = "Price is uncertain";
-		return "<p class='pricy-inject pricy-error'>" + favicon + errorMsg + "</p>";
+			errorMsg = "Price is uncertain.";
+		return "<p class='pricy-inject pricy-error'>" + favicon + "&nbsp;&nbsp;" + errorMsg + "</p>";
 	} else {
 		return "";
 	}

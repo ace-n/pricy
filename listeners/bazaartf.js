@@ -9,6 +9,7 @@ var BazaarTFListener = {
 	// Favicon URLs
 	wh_favicon: null,
 	tradetf_favicon: null,
+	bptf_favicon: null,
 
 	// Helper function
 	favify: function(url) {
@@ -158,6 +159,29 @@ var BazaarTFListener = {
 		return commonAddItemTradeTF(BazaarTFListener.itemsStore, BazaarTFListener.optionsStore, json, BazaarTFListener.tradetf_favicon, customNamed, parts);
 	},
 
+	// Backpack.tf item adding helper function
+	INTERNAL_addItemBPTF: function (item, attrs) {
+		
+		// Get initial data
+		var name = attrs["data-name"].value;
+		var customNamed = name.indexOf("&quot;") == 0;
+		var craftable = true;
+		if (customNamed)
+			name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
+		
+		// Get more data + additional parts (strange addons/paints)
+		var notes = attrs["data-notes"];
+		var parts = [];
+		if (notes)
+			craftable = (notes.value.indexOf("(Not Craftable)") === -1);
+
+		// Query Trade.tf (and throw an exception if query fails)
+		var json = PricyQuery.queryBPTF(BazaarTFListener.itemsStore, name, craftable);
+
+		// Common add-item logic
+		return commonAddItemBPTF(BazaarTFListener.itemsStore, BazaarTFListener.optionsStore, json, BazaarTFListener.bptf_favicon, customNamed);
+	},
+
 	// Master item adding helper function
 	INTERNAL_addItem: function (item) {
 
@@ -190,7 +214,7 @@ var BazaarTFListener = {
 					newDetails += BazaarTFListener.INTERNAL_addItemTF2WH(item, attrs);
 				}
 				catch (ex) {
-					newDetails += "<p>" + wh_favicon + ex + "</p>";
+					newDetails += "<p>" + BazaarTFListener.wh_favicon + ex + "</p>";
 				}
 			}
 
@@ -201,6 +225,16 @@ var BazaarTFListener = {
 				}
 				catch (ex) {
 					newDetails += "<p>" + BazaarTFListener.tradetf_favicon + ex + "</p>";
+				}
+			}
+
+			// Query Backpack.tf
+			if (Options.PRICES_SHOW_BPTF(BazaarTFListener.optionsStore)) {
+				try {
+					newDetails += BazaarTFListener.INTERNAL_addItemBPTF(item, attrs)
+				}
+				catch (ex) {
+					newDetails += "<p>" + BazaarTFListener.bptf_favicon + ex + "</p>";
 				}
 			}
 
@@ -218,6 +252,7 @@ BazaarTFListener.loadTime = Date.now();
 // Init favicon URLs
 BazaarTFListener.wh_favicon = BazaarTFListener.favify('/icons/wh.ico'),
 BazaarTFListener.tradetf_favicon = BazaarTFListener.favify('/icons/tradetf.ico'),
+BazaarTFListener.bptf_favicon = BazaarTFListener.favify('/icons/bptf.ico'),
 
 // Init kvStores + Level 1 callbacks
 BazaarTFListener.itemsStore = new kvStore("pricyItems", BazaarTFListener.intermediate, false);

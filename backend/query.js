@@ -165,11 +165,9 @@ var PricyQuery = {
 				PricyQuery.updateItemHelper("trd_", store, name, "", cols[1], 0);
 				if (bwe_idx != -1)
 					PricyQuery.updateItemHelper("trd_", store, name, "AddonPart", cols[1], 2);
-				PricyQuery.updateItemHelper("trd_", store, name, "Uncraftable", cols[2], 0);
-				PricyQuery.updateItemHelper("trd_", store, name, "Vintage", cols[3], 0);
-				PricyQuery.updateItemHelper("trd_", store, name, "Genuine", cols[4], 0);
-				PricyQuery.updateItemHelper("trd_", store, name, "Strange", cols[5], 0);
-				PricyQuery.updateItemHelper("trd_", store, name, "Haunted", cols[6], 0);
+				var prefixes = ["Uncraftable", "Vintage", "Genuine", "Strange", "Haunted"];
+				for (var i=2; i <= 6; i++)
+					PricyQuery.updateItemHelper("trd_", store, name, prefixes[i-2], cols[i], 0);
 			}
 
 			// Reset hardcoded items
@@ -293,6 +291,7 @@ var PricyQuery = {
 		name = PricyQuery.normalizeName(store, name, true);
 
 		// Fetch data from cache
+		console.log(name);
 		return store.kvGet("bp_" + (craftable ? "" : "Uncraftable ") + name);
 	},
 
@@ -304,7 +303,7 @@ var PricyQuery = {
 			return dom.getElementById("pricelist").getElementsByTagName("tr");
 		};
 		callback = function (store, rows) {
-			var prefixes = ["Genuine ", "Vintage ", "", "Strange ", "Haunted ", "Collector's "];
+			var prefixes = ["Genuine", "Vintage", "", "Strange", "Haunted", "Collector's"];
 			for (var i=1; i < rows.length; i++) {
 
 				// Get values
