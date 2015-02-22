@@ -166,7 +166,7 @@ var PricyQuery = {
 				if (bwe_idx != -1)
 					PricyQuery.updateItemHelper("trd_", store, name, "AddonPart", cols[1], 2);
 				var prefixes = ["Uncraftable", "Vintage", "Genuine", "Strange", "Haunted"];
-				for (var i=2; i <= 6; i++)
+				for (var j=2; j <= 6; j++)
 					PricyQuery.updateItemHelper("trd_", store, name, prefixes[i-2], cols[i], 0);
 			}
 
@@ -209,6 +209,8 @@ var PricyQuery = {
 		}
 
 		// Grab from cache
+		console.log(name)
+		console.log(store)
 		return store.kvGet("wh_" + name);
 	},
 
@@ -291,7 +293,6 @@ var PricyQuery = {
 		name = PricyQuery.normalizeName(store, name, true);
 
 		// Fetch data from cache
-		console.log(name);
 		return store.kvGet("bp_" + (craftable ? "" : "Uncraftable ") + name);
 	},
 

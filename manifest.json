@@ -36,15 +36,18 @@
   "offline_enabled": false,
 
   "permissions": [
+    "tabs",
     "alarms",
     "storage",
+    "declarativeContent",
     "http://*.tf2wh.com/priceguide",
     "http://*.trade.tf/spreadsheet"
   ],
 
-  "browser_action": {
+  "page_action": {
+    "default_title": "Pricy",
     "default_icon": "icon copy.png",
-    "default_popup": "popup/main.html"
+    "default_popup": "hello.html"
   },
 
   "web_accessible_resources": [
