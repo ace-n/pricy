@@ -58,15 +58,9 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 					favicon +
 					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
 					stock + 
-					htmlSpan(
-						buyBlocked,
-						fa("shopping-cart") + buyPrice
-					) +
+					htmlSpan(buyBlocked, fa("shopping-cart") + buyPrice) +
 					"&nbsp;&nbsp;" +
-					htmlSpan(
-						sellBlocked,
-						fa("dollar") + sellPrice
-					) +
+					htmlSpan(sellBlocked, a("dollar") + sellPrice) +
 				"</p>";
 			return asi;
 		}
@@ -100,7 +94,7 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 				try {
 					unitRatio = PricyQuery.queryTF2WH(itemsStore, json["u"], true)["bp"];
 				} catch (ex) {
-					return "<p class='pricy-inject pricy-error'>" + favicon + " TF2WH error: " + ex + "</p>";
+					return htmlError(favicon, "TF2WH error: " + ex);
 				}
 				f = function(a) { return (a*unitRatio).toFixed(); }
 			} else {
@@ -199,17 +193,18 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			loAlone = f(loAlone); loParts = f(loParts); hiAlone = f(hiAlone); hiParts = f(hiParts);
 
 			// Add details to HTML
+			var f = function(x,y) { return x + (x == y ? "" : " - " + y); }
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
 					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
-					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) +
+					f(loAlone, hiAlone) +
 					faIcon;
 			if (showParts) {
 				asi += 
 					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
-						loParts + (loParts == hiParts ? "" : " - " + hiParts) + 
+						f(loParts, hiParts) +
 						faIcon;
 			}
 			asi += "</p>"
