@@ -1,3 +1,4 @@
+// HTML helpers
 var htmlError = function(favicon, ex) {
 	return "<p class='pricy-inject pricy-error'>" +
 				favicon + "&nbsp;&nbsp;" + ex +
@@ -6,7 +7,11 @@ var htmlError = function(favicon, ex) {
 var htmlSpan = function(_class, content) {
 	return "<span class='" + _class + "'>" + content + "</span>";
 }
+var fa = function(iconName) {
+	return htmlSpan("fa fa-" + iconName,"");
+}
 
+// TF2WH main function
 var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 
 	// Add details to item
@@ -44,23 +49,23 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				case 0:
 					stock = json["h"] + "/" + json["m"];
 				default:
-					stock = htmlSpan("fa fa-inbox","") + stock + "&nbsp;&nbsp;";
+					stock = fa("inbox") + stock + "&nbsp;&nbsp;";
 			}
 
 			// Add details to HTML
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
 					stock + 
 					htmlSpan(
 						buyBlocked,
-						htmlSpan("fa fa-shopping-cart", "") + buyPrice
+						fa("shopping-cart") + buyPrice
 					) +
 					"&nbsp;&nbsp;" +
 					htmlSpan(
 						sellBlocked,
-						htmlSpan("fa fa-dollar", "") + sellPrice
+						fa("dollar") + sellPrice
 					) +
 				"</p>";
 			return asi;
@@ -76,6 +81,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 
 };
 
+// Backpack.tf main function
 var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, customNamed) {
 
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
@@ -104,11 +110,11 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 			hi = f(hi);
 
 			// Add details to HTML
-			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : htmlSpan("fa fa-" + json["uh"], ""));
+			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
 					lo + (lo == hi ? "" : " - " + hi) +
 					faIcon;
 			asi += "</p>"
@@ -134,6 +140,7 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 	}
 };
 
+// Trade.tf main function
 var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, customNamed, parts) {
 
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
@@ -192,16 +199,16 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			loAlone = f(loAlone); loParts = f(loParts); hiAlone = f(hiAlone); hiParts = f(hiParts);
 
 			// Add details to HTML
-			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : htmlSpan("fa fa-" + json["uh"], ""));
+			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
 					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) +
 					faIcon;
 			if (showParts) {
 				asi += 
-					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
 						loParts + (loParts == hiParts ? "" : " - " + hiParts) + 
 						faIcon;
 			}
