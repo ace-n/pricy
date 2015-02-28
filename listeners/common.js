@@ -1,7 +1,11 @@
 // HTML helpers
+var tab = "&nbsp;&nbsp;";
+var tabWrap = function(c) {
+	return tab + c + tab;
+}
 var htmlError = function(favicon, ex) {
 	return "<p class='pricy-inject pricy-error'>" +
-				favicon + "&nbsp;&nbsp;" + ex +
+				favicon + tab + ex +
 			"</p>";
 }
 var htmlSpan = function(_class, content) {
@@ -49,18 +53,18 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				case 0:
 					stock = json["h"] + "/" + json["m"];
 				default:
-					stock = fa("inbox") + stock + "&nbsp;&nbsp;";
+					stock = fa("inbox") + stock + tab;
 			}
 
 			// Add details to HTML
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
+					tabWrap(fa("square-o")) +
 					stock + 
 					htmlSpan(buyBlocked, fa("shopping-cart") + buyPrice) +
-					"&nbsp;&nbsp;" +
-					htmlSpan(sellBlocked, a("dollar") + sellPrice) +
+					tab +
+					htmlSpan(sellBlocked, fa("dollar") + sellPrice) +
 				"</p>";
 			return asi;
 		}
@@ -108,7 +112,7 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
+					tabWrap(fa("square-o")) +
 					lo + (lo == hi ? "" : " - " + hi) +
 					faIcon;
 			asi += "</p>"
@@ -198,12 +202,12 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
+					tabWrap(fa("square-o")) +
 					f(loAlone, hiAlone) +
 					faIcon;
 			if (showParts) {
 				asi += 
-					"&nbsp;&nbsp;" + fa("square-o") + "&nbsp;&nbsp;" +
+					tabWrap(fa("square-o")) +
 						f(loParts, hiParts) +
 						faIcon;
 			}
