@@ -3,6 +3,9 @@ var htmlError = function(favicon, ex) {
 				favicon + "&nbsp;&nbsp;" + ex +
 			"</p>";
 }
+var htmlSpan = function(_class, content) {
+	return "<span class='" + _class + "'>" + content + "</span>";
+}
 
 var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 
@@ -41,22 +44,24 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				case 0:
 					stock = json["h"] + "/" + json["m"];
 				default:
-					stock = "<span class='fa fa-inbox'/>: " + stock + "&nbsp;&nbsp;";
+					stock = htmlSpan("fa fa-inbox","") + stock + "&nbsp;&nbsp;";
 			}
 
 			// Add details to HTML
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;<span class='fa fa-square-o'/>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
 					stock + 
-					"<span class='" + buyBlocked + "'>" +
-						"<span class='fa fa-shopping-cart'/>: " + buyPrice +
-					"</span>" +
+					htmlSpan(
+						buyBlocked,
+						htmlSpan("fa fa-shopping-cart", "") + buyPrice
+					) +
 					"&nbsp;&nbsp;" +
-					"<span class='" + sellBlocked + "'>" +
-						"<span class='fa fa-dollar'/>: " + sellPrice +
-					"</span>" +
+					htmlSpan(
+						sellBlocked,
+						htmlSpan("fa fa-dollar", "") + sellPrice
+					) +
 				"</p>";
 			return asi;
 		}
@@ -99,11 +104,11 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 			hi = f(hi);
 
 			// Add details to HTML
-			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
+			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : htmlSpan("fa fa-" + json["uh"], ""));
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;<span class='fa fa-square-o'></span>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
 					lo + (lo == hi ? "" : " - " + hi) +
 					faIcon;
 			asi += "</p>"
@@ -128,7 +133,6 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 		return "";
 	}
 };
-
 
 var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, customNamed, parts) {
 
@@ -188,17 +192,16 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			loAlone = f(loAlone); loParts = f(loParts); hiAlone = f(hiAlone); hiParts = f(hiParts);
 
 			// Add details to HTML
-			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : " <span class='fa fa-" + json["uh"] + "'/>");
+			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : htmlSpan("fa fa-" + json["uh"], ""));
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					"&nbsp;&nbsp;<span class='fa fa-square-o'></span>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
 					loAlone + (loAlone == hiAlone ? "" : " - " + hiAlone) +
 					faIcon;
 			if (showParts) {
 				asi += 
-					"&nbsp;&nbsp;" +
-						"<span class='fa fa-plus-square-o'></span>&nbsp;&nbsp;" +
+					"&nbsp;&nbsp;" + htmlSpan("fa fa-square-o","") + "&nbsp;&nbsp;" +
 						loParts + (loParts == hiParts ? "" : " - " + hiParts) + 
 						faIcon;
 			}
