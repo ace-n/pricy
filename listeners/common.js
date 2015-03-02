@@ -14,6 +14,17 @@ var htmlSpan = function(_class, content) {
 var fa = function(iconName) {
 	return htmlSpan("fa fa-" + iconName,"");
 }
+var htmlLoHi = function(lo, hi) {
+	return lo + (lo === hi ? "" : " - " + hi);
+}
+var htmlNormalFailures = function(customNamed, json, favicon) {
+	var errorMsg = "No match found.";
+		if (customNamed)
+			errorMsg = "Custom names not yet supported.";
+		else if (json && json["l"] == "?")
+			errorMsg = "Price is uncertain.";
+		return htmlError(favicon, errorMsg);
+}
 
 // TF2WH main function
 var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
@@ -53,18 +64,19 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				case 0:
 					stock = json["h"] + "/" + json["m"];
 				default:
-					stock = fa("inbox") + stock + tab;
+					stock = fa("inbox") + tabWrap(stock);
 			}
 
 			// Add details to HTML
 			asi = 
 				"<p class='pricy-inject'>" +
 					favicon +
-					tabWrap(fa("square-o")) +
-					stock + 
-					htmlSpan(buyBlocked, fa("shopping-cart") + buyPrice) +
-					tab +
-					htmlSpan(sellBlocked, fa("dollar") + sellPrice) +
+						tabWrap(fa("square-o")) +
+							stock +
+						tab +
+							htmlSpan(buyBlocked, fa("shopping-cart") + tabWrap(buyPrice)) +
+						tab +
+							htmlSpan(sellBlocked, fa("dollar") + tab + sellPrice) +
 				"</p>";
 			return asi;
 		}
@@ -72,7 +84,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 			return htmlError(favicon, "Error: " + ex);
 		}
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
-		return htmlError(favicon, (customNamed ? "Custom names not yet supported" : "No match found."));
+		return htmlNormalFailures(customNamed, json, favicon); // Return error message
 	} else {
 		return "";
 	}
@@ -111,11 +123,10 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = 
 				"<p class='pricy-inject'>" +
-					favicon +
-					tabWrap(fa("square-o")) +
-					lo + (lo == hi ? "" : " - " + hi) +
-					faIcon;
-			asi += "</p>"
+					favicon + tabWrap(fa("square-o")) +
+					htmlLoHi(lo, hi) + tab +
+					faIcon +
+				"</p>";
 
 			// Done!
 			return asi;
@@ -125,14 +136,7 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 			return htmlError(favicon, "Error: " + ex);
 		}
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
-
-		// Return error message
-		var errorMsg = "No match found.";
-		if (customNamed)
-			errorMsg = "Custom names not yet supported.";
-		else if (json && json["l"] == "?")
-			errorMsg = "Price is uncertain.";
-		return htmlError(favicon, errorMsg);
+		return htmlNormalFailures(customNamed, json, favicon);
 	} else {
 		return "";
 	}
@@ -197,19 +201,15 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			loAlone = f(loAlone); loParts = f(loParts); hiAlone = f(hiAlone); hiParts = f(hiParts);
 
 			// Add details to HTML
-			var f = function(x,y) { return x + (x == y ? "" : " - " + y); }
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
-			asi = 
-				"<p class='pricy-inject'>" +
-					favicon +
-					tabWrap(fa("square-o")) +
-					f(loAlone, hiAlone) +
+			asi = "<p class='pricy-inject'>" +
+					favicon + tabWrap(fa("square-o"))+ 
+					htmlLoHi(loAlone, hiAlone) + tab + 
 					faIcon;
 			if (showParts) {
-				asi += 
+				asi +=
 					tabWrap(fa("square-o")) +
-						f(loParts, hiParts) +
-						faIcon;
+					htmlLoHi(loParts, hiParts) + faIcon;
 			}
 			asi += "</p>"
 
@@ -221,14 +221,7 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			return htmlError(favicon, "Error: " + ex);
 		}
 	} else if (Options.ITEMS_SHOW_NORMAL_FAILURES(optionsStore)) {
-
-		// Return error message
-		var errorMsg = "No match found.";
-		if (customNamed)
-			errorMsg = "Custom names not yet supported.";
-		else if (json && json["l"] == "?")
-			errorMsg = "Price is uncertain.";
-		return htmlError(favicon, errorMsg);
+		return htmlNormalFailures(customNamed, json, favicon);
 	} else {
 		return "";
 	}
