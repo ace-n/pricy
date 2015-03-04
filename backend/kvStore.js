@@ -28,7 +28,7 @@ function kvStore(name, initCallback, writable) {
 	this.kvSave = function() {
 		var ko = {}
 		ko[this.kvName] = this.kvObj;
-		chrome.storage.local.set(ko, function() { console.log(ko); });
+		chrome.storage.local.set(ko);
 	}
 
 	this.kvGet = function (k) {

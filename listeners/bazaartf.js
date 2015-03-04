@@ -95,7 +95,6 @@ var BazaarTFListener = {
 		var json = PricyQuery.queryTF2WH(BazaarTFListener.itemsStore, name, craftable);
 		
 		// Common add-item logic
-		console.log(json);
 		return commonAddItemTF2WH(BazaarTFListener.optionsStore, json, BazaarTFListener.wh_favicon, customNamed);
 	},
 

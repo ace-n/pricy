@@ -93,7 +93,7 @@ var PricyQuery = {
 	updateItemHelper: function (prefix, store, name, quality, elem, childIdx) {
 		var obj = {};
 		if (elem) {
-			var child = elem.children[childIdx];
+			var child = (prefix == "trd_" ? elem.getElementsByTagName("a") : elem.children)[childIdx];
 			if (child) {
 
 				var price = child.innerText.trim(); // "?" marks the price as 'existing'
@@ -162,12 +162,14 @@ var PricyQuery = {
 				json = {};
 				cols = rows[i].getElementsByTagName("td");
 				name = PricyQuery.normalizeName(store, name, true);
-				PricyQuery.updateItemHelper("trd_", store, name, "", cols[1], 0);
+
 				if (bwe_idx != -1)
 					PricyQuery.updateItemHelper("trd_", store, name, "AddonPart", cols[1], 2);
-				var prefixes = ["Uncraftable", "Vintage", "Genuine", "Strange", "Haunted"];
-				for (var j=2; j <= 6; j++)
+				var prefixes = ["", "Uncraftable", "Vintage", "Genuine", "Strange", "Haunted"];
+				for (var j = 1; j <= 6; j++) {
+					console.log(cols[i])
 					PricyQuery.updateItemHelper("trd_", store, name, prefixes[i-2], cols[i], 0);
+				}
 			}
 
 			// Reset hardcoded items
@@ -176,7 +178,6 @@ var PricyQuery = {
 			store.kvSet("trd_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"});
 
 			// Save kvStore (since a lot of things have just been updated)
-			store.kvSet("trd-querying", "0");
 			store.kvSave();
 
 			// Done!
@@ -209,8 +210,6 @@ var PricyQuery = {
 		}
 
 		// Grab from cache
-		console.log(name)
-		console.log(store)
 		return store.kvGet("wh_" + name);
 	},
 
@@ -233,22 +232,18 @@ var PricyQuery = {
 			var i, cols, th, i_name, clName, i_buyPrice, i_sellPrice, i_stock, i_sIdx, i_stock_cur, i_stock_max, i_buyConv, i_sellConv, i_toJson;
 
 			// Parse HTML
-			for (i=0; i<rows.length; i++) {
+			for (i=1; i<rows.length; i++) {
 				cols = rows[i].getElementsByTagName("td");
 
 				/********************* Get data *********************/
 				// Name
 				th = rows[i].getElementsByTagName("th")[0];
-				i_name = th.id;
+				i_name = th.childNodes[0].innerText;
 				if (!i_name) {
 					continue;
 				}
 				if (i_name == "Hat") {
 					i_name = "Haunted Hat"; // Undo a hack on TF2WH's part
-				}
-				clName = th.className;
-				if (clName && clName != "base") {
-					i_name = clName.charAt(0).toUpperCase() + clName.slice(1) + " " + i_name;
 				}
 
 				// Buy/sell price
@@ -277,7 +272,6 @@ var PricyQuery = {
 			}; 
 
 			// Save kvStore (since a lot of things have just been updated)
-			store.kvSet("wh-querying", "0");
 			store.kvSave();
 			
 			// Done!
@@ -330,7 +324,6 @@ var PricyQuery = {
 			store.kvSet("bp_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"});
 
 			// Save kvStore (since a lot of things have just been updated)
-			store.kvSet("bp-querying", "0");
 			store.kvSave();
 			
 			// Done!

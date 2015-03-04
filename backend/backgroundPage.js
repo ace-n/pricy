@@ -26,7 +26,6 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 				period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
 				break;
 			case "trdTf":
-				console.log("TRD-TF")
 				period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
 				break;
 			case "bpTf":
@@ -71,7 +70,7 @@ chrome.runtime.onInstalled.addListener(function() {
 		chrome.declarativeContent.onPageChanged.addRules([{
 			conditions: [
 				new chrome.declarativeContent.PageStateMatcher({
-				pageUrl: { urlMatches: 'tf2(outpost|wh)\.com|bazaar\.tf' },
+				pageUrl: { urlMatches: 'http(s|)://.\.tf2(outpost|wh)\.com|bazaar\.tf' },
 			})],
 			actions: [ 
 				new chrome.declarativeContent.ShowPageAction()
