@@ -1,8 +1,6 @@
 /*********************** Alarm logic ***********************/
 chrome.alarms.onAlarm.addListener(function (alarm) {
 
-	console.log(alarm.name);
-
 	var doQuery = function() {
 		// Query appropriate site
 		switch (name) {

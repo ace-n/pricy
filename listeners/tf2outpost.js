@@ -142,13 +142,9 @@ var TF2OutpostListener = {
 	// Master item adding helper function
 	INTERNAL_addItem: function (item) {
 
-		// Get values
+		// Get values + skip BS items
 		attrs = item.attributes;
-		if (!attrs)
-			return null;
-
-		// Skip actual non-TF2 items
-		if (!attrs["data-hash"] || !Misc.startsWith(attrs["data-hash"].value, "440"))
+		if (!attrs || !attrs["data-hash"] || !Misc.startsWith(attrs["data-hash"].value, "440"))
 			return null;
 
 		// Add additional data
@@ -161,48 +157,28 @@ var TF2OutpostListener = {
 			else if (!newDetails)
 				newDetails = "";
 
-			// Query TF2WH
+			// Generic query handler
+			var f = function(m, favicon, item, attrs) {
+				try {
+					return m(item, attrs);
+				}
+				catch (ex) {
+					console.log(ex);
+					return "<p>" + favicon + "&nbsp;" + ex + "</p>";
+				}
+			}
+
+			// Run queries
 			if (Options.PRICES_SHOW_TF2WH(TF2OutpostListener.optionsStore)) {
-				try {
-					newDetails += TF2OutpostListener.INTERNAL_addItemTF2WH(item, attrs);
-				}
-				catch (ex) {
-					if (ex !== "Item not found.") {
-						console.log(ex);
-						newDetails += "<p>" + TF2OutpostListener.wh_favicon + "&nbsp;" + ex + "</p>";
-					}
-				}
-			}
-
-			// Query Trade.tf
+				newDetails += f(TF2OutpostListener.INTERNAL_addItemTF2WH, TF2OutpostListener.wh_favicon, item, attrs);
 			if (Options.PRICES_SHOW_TRADETF(TF2OutpostListener.optionsStore)) {
-				try {
-					newDetails += TF2OutpostListener.INTERNAL_addItemTradeTF(item, attrs);
-				}
-				catch (ex) {
-					if (ex !== "Item not found.") {
-						console.log(ex);
-						newDetails += "<p>" + TF2OutpostListener.tradetf_favicon + "&nbsp;" + ex + "</p>";
-					}
-				}
-			}
-
-			// Query Backpack.tf
+				newDetails += f(TF2OutpostListener.INTERNAL_addItemTradeTF, TF2OutpostListener.tradetf_favicon, item, attrs);
 			if (Options.PRICES_SHOW_BPTF(TF2OutpostListener.optionsStore)) {
-				try {
-					newDetails += TF2OutpostListener.INTERNAL_addItemBPTF(item, attrs);
-				}
-				catch (ex) {
-					if (ex !== "Item not found.") {
-						console.log(ex);
-						newDetails += "<p>" + TF2OutpostListener.bptf_favicon + "&nbsp;" + ex + "</p>";
-					}
-				}
-			}
+				newDetails += f(TF2OutpostListener.INTERNAL_addItemBPTF, TF2OutpostListener.bptf_favicon, item, attrs);
 
-			if (newDetails) {
+			// Append details
+			if (newDetails)
 				item.setAttribute("data-subtitle", "<div class='pricy-container'>" + newDetails + "</div>");
-			}
 		};
 		ael(item, attrs, attrs['data-subtitle'].value);
 	}

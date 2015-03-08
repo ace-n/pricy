@@ -14,16 +14,17 @@ var htmlSpan = function(_class, content) {
 var fa = function(iconName) {
 	return htmlSpan("fa fa-" + iconName,"");
 }
-var htmlLoHi = function(lo, hi) {
-	return lo + (lo === hi ? "" : " - " + hi);
+var htmlLoHi = function(lo, hi, startIcon, faIcon, currencyIcon) {
+	var loHi = lo + (lo === hi ? "" : " - " + hi);
+	return startIcon + tabWrap(fa(faIcon)) + loHi + "&nbsp;" + currencyIcon;
 }
 var htmlNormalFailures = function(customNamed, json, favicon) {
 	var errorMsg = "No match found.";
-		if (customNamed)
-			errorMsg = "Custom names not yet supported.";
-		else if (json && json["l"] == "?")
-			errorMsg = "Price is uncertain.";
-		return htmlError(favicon, errorMsg);
+	if (customNamed)
+		errorMsg = "Custom names not yet supported.";
+	else if (json && json["l"] == "?")
+		errorMsg = "Price is uncertain.";
+	return htmlError(favicon, errorMsg);
 }
 
 // TF2WH main function
@@ -73,7 +74,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 					favicon +
 						tabWrap(fa("square-o")) + stock +
 						tab + htmlSpan(buyBlocked, fa("shopping-cart") + tabWrap(buyPrice)) +
-						tab + htmlSpan(sellBlocked, fa("dollar") + tab + sellPrice) +
+						tabWrap(htmlSpan(sellBlocked, fa("dollar")) + sellPrice) +
 				"</p>";
 			return asi;
 		}
@@ -92,14 +93,13 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, customNamed) {
 
 	var asi; // "Automatic semicolon insertion" = return statements must be one liners
-	var showParts, i, pJson, loCur, hiCur, keyRefRatio, unitRatio; // Other loop vars
+	var showParts, i, f, pJson, loCur, hiCur, keyRefRatio, unitRatio, lo, hi; // Other loop vars
 	keyRefRatio = null;
 	if (json && json["l"] !== "?") {
 		try {
 
 			// Init variables
-			var lo = json["l"];
-			var hi = json["h"];
+			lo = json["l"]; hi = json["h"];
 
 			// Convert lo/hi prices to appropriate units
 			var f;
@@ -120,9 +120,7 @@ var commonAddItemBPTF = function(itemsStore, optionsStore, json, favicon, custom
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = 
 				"<p class='pricy-inject'>" +
-					favicon + tabWrap(fa("square-o")) +
-					htmlLoHi(lo, hi) + tab +
-					faIcon +
+					htmlLoHi(lo, hi, favicon, "square-o", faIcon)
 				"</p>";
 
 			// Done!
@@ -200,13 +198,9 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			// Add details to HTML
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = "<p class='pricy-inject'>" +
-					favicon + tabWrap(fa("square-o"))+ 
-					htmlLoHi(loAlone, hiAlone) + tab + 
-					faIcon;
+					htmlLoHi(loAlone, hiAlone, favicon, "square-o", faIcon);
 			if (showParts) {
-				asi +=
-					tabWrap(fa("square-o")) +
-					htmlLoHi(loParts, hiParts) + faIcon;
+				asi += tab + htmlLoHi(loParts, hiParts, "", "plus-square-o", faIcon);
 			}
 			asi += "</p>"
 

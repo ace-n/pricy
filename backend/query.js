@@ -4,7 +4,6 @@ var PricyQuery = {
 	normalizeName: function(store, name, removeThe) {
 
 		// TODO: Organize list below from most common to most rare
-		// TODO: Bail out of name replacement loop when name changes
 
 		// Convert strange types (eg. "Face-melting") to "Strange"
 		var types = [
@@ -30,14 +29,15 @@ var PricyQuery = {
 			"Australian ",
 			"Hale's Own "];
 
-		var i, t;
+		var i, t, n;
 		for (i=0; i<types.length; i++) {
 			t = types[i];
 			if (Misc.startsWith(name, t)) {
 
 				// Replace name iff. item is actually strange
-				if (PricyQuery.queryExists(store, name.slice(t.length)))
-					name = "Strange " + name.slice(t.length);
+				n = name.slice(t.length);
+				if (PricyQuery.queryExists(store, n))
+					name = "Strange " + n;
 				break;
 			}
 		}
@@ -126,8 +126,7 @@ var PricyQuery = {
 					}
 				}
 				else {
-					json["l"] = "?";
-					json["h"] = "?";
+					json["l"] = json["h"] = "?";
 				}
 
 				// Store JSON in memory
@@ -139,8 +138,7 @@ var PricyQuery = {
 	// Actually query trade.tf itself - SHOULD ONLY BE CALLED FROM BACKGROUND PAGE
 	updateTradeTF: function (store) {
 		rowFunc = function (response) {
-			var dp = new DOMParser();
-			var dom = dp.parseFromString(response, "text/html");
+			var dom = (new DOMParser()).parseFromString(response, "text/html");
 			var ss = dom.getElementById("spreadsheet");
 			return ss.getElementsByTagName("tr");
 		};
@@ -167,7 +165,6 @@ var PricyQuery = {
 					PricyQuery.updateItemHelper("trd_", store, name, "AddonPart", cols[1], 2);
 				var prefixes = ["", "Uncraftable", "Vintage", "Genuine", "Strange", "Haunted"];
 				for (var j = 1; j <= 6; j++) {
-					console.log(cols[i])
 					PricyQuery.updateItemHelper("trd_", store, name, prefixes[i-2], cols[i], 0);
 				}
 			}
@@ -190,23 +187,21 @@ var PricyQuery = {
 	queryTF2WH: function (store, name, craftable) {
 
 		// Normalize name
-		name = PricyQuery.normalizeName(store, name, true);
-		name = name.replace(new RegExp("^Strange (?=.?Part:)"), "");
+		name = PricyQuery.normalizeName(store, name, true).replace(new RegExp("^Strange (?=.?Part:)"), "");
 
 		// Handle uncraftable items
 		if (!craftable) {
 
 			// Check craftability states
 			var variants = 0;
-			if (PricyQuery.queryTradeTF(store, name, true, false) || PricyQuery.queryBPTF(store, name, true)) {
+			if (PricyQuery.queryExists(store, name))
 				variants++;
-			}
-			if (PricyQuery.queryTradeTF(store, name, false, false) || PricyQuery.queryBPTF(store, name, true)) {
+			if (PricyQuery.queryExists(store, "Uncraftable " + name))
 				variants++;
-			}
 
 			// Ignore items TF2WH doesn't accept
-			return null
+			if (variants !== 1)
+				return null
 		}
 
 		// Grab from cache
@@ -232,6 +227,8 @@ var PricyQuery = {
 			var i, cols, th, i_name, clName, i_buyPrice, i_sellPrice, i_stock, i_sIdx, i_stock_cur, i_stock_max, i_buyConv, i_sellConv, i_toJson;
 
 			// Parse HTML
+			var f1 = function(c) { return c.innerText.replace(/,/g,""); }
+			var f2 = function(c) { return PricyQuery.convertFontTF2WH(c.getAttribute("data-conversion")); }
 			for (i=1; i<rows.length; i++) {
 				cols = rows[i].getElementsByTagName("td");
 
@@ -239,17 +236,15 @@ var PricyQuery = {
 				// Name
 				th = rows[i].getElementsByTagName("th")[0];
 				i_name = th.childNodes[0].innerText;
-				if (!i_name) {
+				if (!i_name)
 					continue;
-				}
-				if (i_name == "Hat") {
+				if (i_name == "Hat")
 					i_name = "Haunted Hat"; // Undo a hack on TF2WH's part
-				}
 
 				// Buy/sell price
-				i_buyPrice = cols[1].innerText.replace(/,/g,"");
-				i_sellPrice = cols[2].innerText.replace(/,/g,"");
-				i_sellPrice_u = cols[3].innerText.replace(/,/g,""); // WH Ultimate price
+				i_buyPrice = f1(cols[1]);
+				i_sellPrice = f1(cols[2]);
+				i_sellPrice_u = f1(cols[3]); // WH Ultimate price
 				
 				// Stock
 				i_stock = cols[0].innerText.replace(/,/g,"");
@@ -258,9 +253,9 @@ var PricyQuery = {
 				i_stock_max = i_stock.slice(i_sIdx+1);
 
 				// Conversions
-				i_buyConv = PricyQuery.convertFontTF2WH(cols[1].getAttribute("data-conversion"));
-				i_sellConv = PricyQuery.convertFontTF2WH(cols[2].getAttribute("data-conversion"));
-				i_sellConv_u = PricyQuery.convertFontTF2WH(cols[3].getAttribute("data-conversion"));
+				i_buyConv = f2(cols[1]);
+				i_sellConv = f2(cols[2]);
+				i_sellConv_u = f2(cols[3]);
 
 				/**************** Build + store JSON ****************/
 				// Build JSON
@@ -282,29 +277,23 @@ var PricyQuery = {
 
 	/* Query the Backpack.tf cache for an individual item */
 	queryBPTF: function (store, name, craftable) {
-
-		// Normalize name
 		name = PricyQuery.normalizeName(store, name, true);
-
-		// Fetch data from cache
 		return store.kvGet("bp_" + (craftable ? "" : "Uncraftable ") + name);
 	},
 
 	// Actually query Backpack.tf itself - SHOULD ONLY BE CALLED FROM BACKGROUND PAGE
 	updateBPTF: function (store) {
 		rowFunc = function (response) {
-			var dp = new DOMParser();
-			var dom = dp.parseFromString(response, "text/html");
+			var dom = (new DOMParser()).parseFromString(response, "text/html");
 			return dom.getElementById("pricelist").getElementsByTagName("tr");
 		};
 		callback = function (store, rows) {
 			var prefixes = ["Genuine", "Vintage", "", "Strange", "Haunted", "Collector's"];
-			for (var i=1; i < rows.length; i++) {
+			var name, i;
+			for (i=1; i < rows.length; i++) {
 
-				// Get values
-				var name = rows[i].childNodes[0].innerText;
-
-				// Ignore hardcoded items
+				// Get values + ignore hardcoded items
+				name = rows[i].childNodes[0].innerText;
 				if (name === "Refined Metal")
 					continue;
 
@@ -320,13 +309,9 @@ var PricyQuery = {
 				}
 			}
 
-			// Reset hardcoded items
-			store.kvSet("bp_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"});
-
-			// Save kvStore (since a lot of things have just been updated)
+			// Wrap things up
+			store.kvSet("bp_Refined Metal", {"l": 1, "h": 1, "u": "Refined Metal", "uh": "gear"}); // Hardcoded items
 			store.kvSave();
-			
-			// Done!
 			console.log("[Pricy] Backpack.tf query complete!");
 		};
 		PricyQuery.xhrQuery(store, "http://backpack.tf/pricelist/spreadsheet", "bp", rowFunc, callback);
