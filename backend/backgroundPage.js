@@ -2,36 +2,27 @@
 chrome.alarms.onAlarm.addListener(function (alarm) {
 
 	var doQuery = function() {
-		// Query appropriate site
-		switch (name) {
-			case "tf2wh":
-				PricyQuery.updateTF2WH(itemsStore);
-				break;
-			case "trdTf":
-				PricyQuery.updateTradeTF(itemsStore);
-				break;
-			case "bpTf":
-				PricyQuery.updateBPTF(itemsStore);
-				break;
-			default:
-				throw "Invalid alarm name";
-		};
 
-		// Schedule next query
+		// Run query + schedule next one
 		var period;
 		switch (name) {
 			case "tf2wh":
+				PricyQuery.updateTF2WH(itemsStore);
 				period = Options.UPDATE_TF2WH_FREQUENCY(optionsStore);
 				break;
 			case "trdTf":
+				PricyQuery.updateTradeTF(itemsStore);
 				period = Options.UPDATE_TRADETF_FREQUENCY(optionsStore);
 				break;
 			case "bpTf":
+				PricyQuery.updateBPTF(itemsStore);
 				period = Options.UPDATE_BPTF_FREQUENCY(optionsStore);
 				break;
 			default:
 				throw "Invalid alarm name";
 		};
+
+		// Mark schedule
 		chrome.alarms.create(name, {"when": Date.now() + period * 60000});
 	}
 

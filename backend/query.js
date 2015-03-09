@@ -164,8 +164,11 @@ var PricyQuery = {
 				if (bwe_idx != -1)
 					PricyQuery.updateItemHelper("trd_", store, name, "AddonPart", cols[1], 2);
 				var prefixes = ["", "Uncraftable", "Vintage", "Genuine", "Strange", "Haunted"];
+				console.log(name); console.log(cols[4]);
 				for (var j = 1; j <= 6; j++) {
-					PricyQuery.updateItemHelper("trd_", store, name, prefixes[i-2], cols[i], 0);
+					//if (cols[i])
+					//	console.log(name + " / " + prefixes[i-2] + " / " + cols[i].innerHTML);
+					PricyQuery.updateItemHelper("trd_", store, name, prefixes[j-1], cols[i], 0);
 				}
 			}
 

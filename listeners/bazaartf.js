@@ -208,36 +208,26 @@ var BazaarTFListener = {
 			else if (!newDetails)
 				newDetails = "";
 
-			// Query TF2WH
-			if (Options.PRICES_SHOW_TF2WH(BazaarTFListener.optionsStore)) {
+			// Generic query handler
+			var f = function(m, favicon, item, attrs) {
 				try {
-					newDetails += BazaarTFListener.INTERNAL_addItemTF2WH(item, attrs);
+					return m(item, attrs);
 				}
 				catch (ex) {
-					newDetails += "<p>" + BazaarTFListener.wh_favicon + ex + "</p>";
+					console.log(ex);
+					return "<p>" + favicon + "&nbsp;" + ex + "</p>";
 				}
 			}
 
-			// Query Trade.tf
-			if (Options.PRICES_SHOW_TRADETF(BazaarTFListener.optionsStore)) {
-				try {
-					newDetails += BazaarTFListener.INTERNAL_addItemTradeTF(item, attrs)
-				}
-				catch (ex) {
-					newDetails += "<p>" + BazaarTFListener.tradetf_favicon + ex + "</p>";
-				}
-			}
+			// Run queries
+			if (Options.PRICES_SHOW_TF2WH(BazaarTFListener.optionsStore))
+				newDetails += f(BazaarTFListener.INTERNAL_addItemTF2WH, BazaarTFListener.wh_favicon, item, attrs);
+			if (Options.PRICES_SHOW_TRADETF(BazaarTFListener.optionsStore))
+				newDetails += f(BazaarTFListener.INTERNAL_addItemTradeTF, BazaarTFListener.tradetf_favicon, item, attrs);
+			if (Options.PRICES_SHOW_BPTF(BazaarTFListener.optionsStore))
+				newDetails += f(BazaarTFListener.INTERNAL_addItemBPTF, BazaarTFListener.bptf_favicon, item, attrs);
 
-			// Query Backpack.tf
-			if (Options.PRICES_SHOW_BPTF(BazaarTFListener.optionsStore)) {
-				try {
-					newDetails += BazaarTFListener.INTERNAL_addItemBPTF(item, attrs)
-				}
-				catch (ex) {
-					newDetails += "<p>" + BazaarTFListener.bptf_favicon + ex + "</p>";
-				}
-			}
-
+			// Append details
 			if (newDetails) {
 				item.setAttribute("data-details", newDetails);
 			}
