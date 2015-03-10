@@ -16,7 +16,7 @@ var fa = function(iconName) {
 }
 var htmlLoHi = function(lo, hi, startIcon, faIcon, currencyIcon) {
 	var loHi = lo + (lo === hi ? "" : " - " + hi);
-	return startIcon + tabWrap(fa(faIcon)) + loHi + "&nbsp;" + currencyIcon;
+	return startIcon + tab + fa(faIcon) + "&nbsp;" + loHi + "&nbsp;" + currencyIcon;
 }
 var htmlNormalFailures = function(customNamed, json, favicon) {
 	var errorMsg = "No match found.";
@@ -73,8 +73,8 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				"<p class='pricy-inject'>" +
 					favicon +
 						tabWrap(fa("square-o")) + stock +
-						tab + htmlSpan(buyBlocked, fa("shopping-cart") + tabWrap(buyPrice)) +
-						tabWrap(htmlSpan(sellBlocked, fa("dollar")) + sellPrice) +
+						htmlSpan(buyBlocked, fa("shopping-cart") + "&nbsp;" + buyPrice) +
+						tabWrap(htmlSpan(sellBlocked, fa("dollar")) + "&nbsp;" + sellPrice) +
 				"</p>";
 			return asi;
 		}
@@ -199,9 +199,8 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			faIcon = (Options.PRICE_CURRENCY_MODE(optionsStore) === 0 ? "" : fa(json["uh"]));
 			asi = "<p class='pricy-inject'>" +
 					htmlLoHi(loAlone, hiAlone, favicon, "square-o", faIcon);
-			if (showParts) {
+			if (showParts)
 				asi += tab + htmlLoHi(loParts, hiParts, "", "plus-square-o", faIcon);
-			}
 			asi += "</p>"
 
 			// Done!

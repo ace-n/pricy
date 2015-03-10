@@ -12,13 +12,13 @@
 
   "content_scripts": [
     {
-      "matches": ["http://bazaar.tf/*", "http://*.tf2outpost.com/*", "http://*.tf2wh.com/*", "http://*.backpack.tf/*"],
+      "matches": ["http://bazaar.tf/*", "http://www.tf2outpost.com/*", "http://*.tf2wh.com/*"],
       "css": ["fontAwesome/css/font-awesome.min.css", "listeners/injected.css"],
       "js": ["backend/kvStore.js", "misc.js", "constants.js", "backend/optionsIO.js", "backend/query.js", "listeners/common.js"]
     },
 
     {
-      "matches": ["http://*.tf2outpost.com/*"],
+      "matches": ["http://www.tf2outpost.com/*"],
       "js": ["listeners/tf2outpost.js"]
     },
 
@@ -41,7 +41,8 @@
     "storage",
     "declarativeContent",
     "http://*.tf2wh.com/priceguide",
-    "http://*.trade.tf/spreadsheet"
+    "http://*.trade.tf/spreadsheet",
+    "http://backpack.tf/pricelist/spreadsheet"
   ],
 
   "page_action": {

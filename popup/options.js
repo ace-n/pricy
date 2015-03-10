@@ -78,7 +78,8 @@ var callback = function () {
 	/* Num-box helper function */
 	var numboxBoundUpdate = function(t, tbx, idx) {
 		tbx.parent().children("span").removeClass("disabled");
-		if (idx === Options.FREQUENCIES.length - 1 || idx === parseInt(tbx.attr("minidx"),10)) {
+		console.log(idx + "/" + (Options.PERIODS.length - 1))
+		if (idx === Options.PERIODS.length - 1 || idx === parseInt(tbx.attr("minidx"),10)) {
 			t.addClass("disabled");
 		}
 	};
@@ -89,8 +90,10 @@ var callback = function () {
 		// Initialize attrs
 		var t = $(this);
 		var tbx = $("#" + t.attr("linkid"));
-		var idx = t.attr("minidx");
-		t.attr("value", Options.FREQUENCIES[idx]);
+		var idx = store.kvGet(t.attr("name"));
+		if (!idx)
+			idx = t.attr("minidx");
+		t.attr("value", Options.PERIOD_LABELS[idx]);
 		t.attr("idx", idx);
 
 		// Update bound indicators
@@ -111,18 +114,18 @@ var callback = function () {
 
 		// Modify idx/value
 		if (t.text() === "+") {
-			idx = Math.min(idx + 1, Options.FREQUENCIES.length - 1);
+			idx = Math.min(idx + 1, Options.PERIODS.length - 1);
 		} else {
 			idx = Math.max(idx - 1, tbx.attr("minidx"));
 		}
 		tbx.attr("idx", idx);
-		tbx.attr("value", Options.FREQUENCIES[idx]);
+		tbx.attr("value", Options.PERIOD_LABELS[idx]);
 
 		// Update bound indicators
 		numboxBoundUpdate(t, tbx, idx);
 
 		// Update stored properties
-		store.kvSet(tbx.attr("id"), Options.PERIODS[idx]);
+		store.kvSet(tbx.attr("name"), idx);
 		store.kvSave();
 	});
 

@@ -169,11 +169,11 @@ var TF2OutpostListener = {
 			}
 
 			// Run queries
-			if (Options.PRICES_SHOW_TF2WH(TF2OutpostListener.optionsStore)) {
+			if (Options.PRICES_SHOW_TF2WH(TF2OutpostListener.optionsStore))
 				newDetails += f(TF2OutpostListener.INTERNAL_addItemTF2WH, TF2OutpostListener.wh_favicon, item, attrs);
-			if (Options.PRICES_SHOW_TRADETF(TF2OutpostListener.optionsStore)) {
+			if (Options.PRICES_SHOW_TRADETF(TF2OutpostListener.optionsStore))
 				newDetails += f(TF2OutpostListener.INTERNAL_addItemTradeTF, TF2OutpostListener.tradetf_favicon, item, attrs);
-			if (Options.PRICES_SHOW_BPTF(TF2OutpostListener.optionsStore)) {
+			if (Options.PRICES_SHOW_BPTF(TF2OutpostListener.optionsStore))
 				newDetails += f(TF2OutpostListener.INTERNAL_addItemBPTF, TF2OutpostListener.bptf_favicon, item, attrs);
 
 			// Append details

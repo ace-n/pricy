@@ -1,7 +1,7 @@
 var Options = {
 
 	/* List of frequencies with their periods in minutes */
-	FREQUENCIES: ["15 mins", "30 mins", "1 hour", "3 hours", "6 hours", "12 hours", "1 day"],
+	PERIOD_LABELS: ["15 mins", "30 mins", "1 hour", "3 hours", "6 hours", "12 hours", "1 day"],
 	PERIODS: [15, 30, 60, 60*3, 60*6, 60*12, 60*24],
 
 	/* Specify whether 'normal failures' are shown */
@@ -64,17 +64,17 @@ var Options = {
 	/******************************************************/
 	/* Specify TF2WH update frequency (in minutes) */
 	UPDATE_TF2WH_FREQUENCY: function (optionsStore) {
-		return 15;
+		return Options.PERIODS[optionsStore.kvGet("UPDATE_TF2WH_PERIOD")] || 15;
 	},
 
 	/* Specify Trade.tf update frequency (in minutes) */
 	UPDATE_TRADETF_FREQUENCY: function (optionsStore) {
-		return 15;
+		return Options.PERIODS[optionsStore.kvGet("UPDATE_TRADETF_PERIOD")] || 60;
 	},
 
 	/* Specify Backpack.tf update frequency (in minutes) */
 	UPDATE_BPTF_FREQUENCY: function (optionsStore) {
-		return 15;
+		return Options.PERIODS[optionsStore.kvGet("UPDATE_BPTF_PERIOD")] || 60;
 	},
 
 	/******************************************************/
