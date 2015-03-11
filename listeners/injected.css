@@ -1,6 +1,7 @@
 /***** Global stuff *****/
 .pricy-inject {
-	color: white;
+	color: #999999;
+	font-weight: normal;
 }
 
 .pricy-inject.pricy-error {
@@ -9,17 +10,17 @@
 
 .pricy-favicon {
 	position:relative;
-	width: 25px;
+	width: 20px;
 }
 
 .pricy-favicon.pricy-bazaartf {
-	top:-1px
-	left:2px;
+	top:-3px;
+	left:4px;
 }
 
 .pricy-favicon.pricy-tf2op {
-	top:7px;
-	left:5px;
+	top:5px;
+	left:7px;
 }
 
 .pricy-favicon.pricy-tf2wh {
@@ -29,6 +30,10 @@
 
 .pricy-stockblocked {
 	color: red;
+}
+
+.pricy-price {
+	color: white;
 }
 
 div.pricy-container {
@@ -64,6 +69,11 @@ div.pricy-container {
 
 .entry:hover > .pricy-tf2wh.pricy-popup > div {
 	display: inline-table;
+}
+
+/* Hide Bazaar.tf's price estimation */
+p.estimated-price {
+	display: none;
 }
 
 /* Hacking TF2WH's UI to match Bazaar.tf's */

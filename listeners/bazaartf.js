@@ -228,9 +228,8 @@ var BazaarTFListener = {
 				newDetails += f(BazaarTFListener.INTERNAL_addItemBPTF, BazaarTFListener.bptf_favicon, item, attrs);
 
 			// Append details
-			if (newDetails) {
+			if (newDetails)
 				item.setAttribute("data-details", newDetails);
-			}
 		};
 		ael(item, attrs, attrs['data-details'].value);
 	}

@@ -16,7 +16,7 @@ var fa = function(iconName) {
 }
 var htmlLoHi = function(lo, hi, startIcon, faIcon, currencyIcon) {
 	var loHi = lo + (lo === hi ? "" : " - " + hi);
-	return startIcon + tab + fa(faIcon) + "&nbsp;" + loHi + "&nbsp;" + currencyIcon;
+	return startIcon + tab + fa(faIcon) + htmlSpan("pricy-price", "&nbsp;" + loHi + "&nbsp;" + currencyIcon);
 }
 var htmlNormalFailures = function(customNamed, json, favicon) {
 	var errorMsg = "No match found.";
@@ -42,7 +42,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 			sellPrice = json["s" + toggle + (Options.PRICES_SHOW_ULTIMATE(optionsStore) ? "-u" : "")];
 
 			// Take stock into account (if necessary)
-			buyBlocked = sellBlocked = "";
+			buyBlocked = sellBlocked = "pricy-price"; // Default "price" style
 			if (Options.PRICES_SHOW_NA_IF_IMPOSSIBLE(optionsStore)) {
 				var curStock = json["h"];
 				if (parseInt(json["m"]) <= curStock) {
@@ -65,7 +65,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				case 0:
 					stock = json["h"] + "/" + json["m"];
 				default:
-					stock = fa("inbox") + tabWrap(stock);
+					stock = fa("inbox") + htmlSpan("pricy-price", tabWrap(stock));
 			}
 
 			// Add details to HTML
@@ -73,8 +73,8 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				"<p class='pricy-inject'>" +
 					favicon +
 						tabWrap(fa("square-o")) + stock +
-						htmlSpan(buyBlocked, fa("shopping-cart") + "&nbsp;" + buyPrice) +
-						tabWrap(htmlSpan(sellBlocked, fa("dollar")) + "&nbsp;" + sellPrice) +
+						fa("shopping-cart") + htmlSpan(buyBlocked, "&nbsp;" + buyPrice) +
+						tabWrap(fa("dollar") + htmlSpan(sellBlocked, "&nbsp;" + sellPrice)) +
 				"</p>";
 			return asi;
 		}
@@ -200,7 +200,7 @@ var commonAddItemTradeTF = function(itemsStore, optionsStore, json, favicon, cus
 			asi = "<p class='pricy-inject'>" +
 					htmlLoHi(loAlone, hiAlone, favicon, "square-o", faIcon);
 			if (showParts)
-				asi += tab + htmlLoHi(loParts, hiParts, "", "plus-square-o", faIcon);
+				asi += htmlLoHi(loParts, hiParts, "", "plus-square-o", faIcon);
 			asi += "</p>"
 
 			// Done!

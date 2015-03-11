@@ -237,8 +237,12 @@ var PricyQuery = {
 				i_name = th.childNodes[0].innerText;
 				if (!i_name)
 					continue;
+
+				// Undo hacks on TF2WH's part
 				if (i_name == "Hat")
-					i_name = "Haunted Hat"; // Undo a hack on TF2WH's part
+					i_name = "Haunted Hat";
+				else if (i_name == "Tyrolean")
+					i_name = "Vintage Tyrolean";
 
 				// Buy/sell price
 				i_buyPrice = f1(cols[1]);

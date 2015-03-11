@@ -80,7 +80,8 @@ var TF2OutpostListener = {
 		var notes = attrs["data-attributes"];
 		var parts = [];
 		if (notes) {
-			var noteLines = (notes.value.slice(5)).split(/<.+?>/g);
+			var noteLines = (notes.value).split(/<.+?>/g);
+			console.log(noteLines);
 			var i, line, pName;
 			var dp = new DOMParser();
 			var isFirstLine = true;
@@ -93,12 +94,12 @@ var TF2OutpostListener = {
 					continue; // Skip null lines
 
 				// Record line info
-				// - Paints
-				else if (Misc.startsWith(line, "Painted: "))
-					parts.push(line.slice(9));
 				// - Skip first line (if we're dealing with strange attributes),
 				//   since it's not an additional part
 				else if (isFirstLine) { isFirstLine = false; }
+				// - Paints
+				else if (noteLines[i-1] == "Painted:")
+					parts.push(line.trim());
 				// - Skip "Crafted/Gifted by" lines
 				else if (Misc.startsWith(line, "Crafted by ") || Misc.startsWith(line, "Gifted on ")) {}
 				// - Strange [Cosmetic] Parts
