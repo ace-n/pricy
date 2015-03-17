@@ -51,11 +51,7 @@ var TF2OutpostListener = {
 
 	// TF2WH item adding helper function
 	INTERNAL_addItemTF2WH: function (item, attrs, name, craftable) {
-
-		// Query TF2WH (and throw an exception if query fails)
 		var json = PricyQuery.queryTF2WH(TF2OutpostListener.itemsStore, name, craftable);
-		
-		// Common add-item logic
 		return commonAddItemTF2WH(TF2OutpostListener.optionsStore, json, TF2OutpostListener.wh_favicon, false);
 	},
 
@@ -108,13 +104,9 @@ var TF2OutpostListener = {
 		return commonAddItemTradeTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.tradetf_favicon, false, parts);
 	},
 
-	// TF2WH item adding helper function
+	// Backpack.tf item adding helper function
 	INTERNAL_addItemBPTF: function (item, attrs, name, craftable) {
-
-		// Query TF2WH (and throw an exception if query fails)
 		var json = PricyQuery.queryBPTF(TF2OutpostListener.itemsStore, name, craftable);
-		
-		// Common add-item logic
 		return commonAddItemBPTF(TF2OutpostListener.itemsStore, TF2OutpostListener.optionsStore, json, TF2OutpostListener.bptf_favicon, false);
 	},
 
