@@ -11,7 +11,7 @@ var TF2OutpostListener = {
 	tradetf_favicon: null,
 	bptf_favicon: null,
 
-	// Helper function
+	// Helper function #1
 	favify: function(url) {
 		return "<img class='pricy-favicon pricy-tf2op' src='" + chrome.extension.getURL(url) + "' /> ";
 	},
@@ -50,14 +50,7 @@ var TF2OutpostListener = {
 	},
 
 	// TF2WH item adding helper function
-	INTERNAL_addItemTF2WH: function (item, attrs) {
-		
-		// Get data
-		var name = (attrs["data-real-name"] || attrs["data-name"]).value;
-		var craftable = true;
-		var flags = attrs["data-flags"];
-		if (flags)
-			craftable = (flags.value.indexOf("(Not Craftable)") === -1);
+	INTERNAL_addItemTF2WH: function (item, attrs, name, craftable) {
 
 		// Query TF2WH (and throw an exception if query fails)
 		var json = PricyQuery.queryTF2WH(TF2OutpostListener.itemsStore, name, craftable);
@@ -67,21 +60,13 @@ var TF2OutpostListener = {
 	},
 
 	// Trade.tf item adding helper function
-	INTERNAL_addItemTradeTF: function (item, attrs) {
-		
-		// Get data
-		var name = (attrs["data-real-name"] || attrs["data-name"]).value;
-		var craftable = true;
-		var flags = attrs["data-flags"];
-		if (flags)
-			craftable = (flags.value.indexOf("(Not Craftable)") === -1);
+	INTERNAL_addItemTradeTF: function (item, attrs, name, craftable) {
 
 		// Get more data + additional parts (strange addons/paints)
 		var notes = attrs["data-attributes"];
 		var parts = [];
 		if (notes) {
 			var noteLines = (notes.value).split(/<.+?>/g);
-			console.log(noteLines);
 			var i, line, pName;
 			var dp = new DOMParser();
 			var isFirstLine = true;
@@ -124,14 +109,7 @@ var TF2OutpostListener = {
 	},
 
 	// TF2WH item adding helper function
-	INTERNAL_addItemBPTF: function (item, attrs) {
-		
-		// Get data
-		var name = (attrs["data-real-name"] || attrs["data-name"]).value;
-		var craftable = true;
-		var flags = attrs["data-flags"];
-		if (flags)
-			craftable = (flags.value.indexOf("(Not Craftable)") === -1);
+	INTERNAL_addItemBPTF: function (item, attrs, name, craftable) {
 
 		// Query TF2WH (and throw an exception if query fails)
 		var json = PricyQuery.queryBPTF(TF2OutpostListener.itemsStore, name, craftable);
@@ -159,9 +137,9 @@ var TF2OutpostListener = {
 				newDetails = "";
 
 			// Generic query handler
-			var f = function(m, favicon, item, attrs) {
+			var f = function(m, favicon, item, attrs, name, craftable) {
 				try {
-					return m(item, attrs);
+					return m(item, attrs, name, craftable);
 				}
 				catch (ex) {
 					console.log(ex);
@@ -169,13 +147,19 @@ var TF2OutpostListener = {
 				}
 			}
 
+			// Get shared data
+			var name = (attrs["data-real-name"] || attrs["data-name"]).value;
+			var craftable = true;
+			if (attrs["data-flags"])
+				craftable = attrs["data-flags"].value.indexOf("(Uncraftable)") === -1;
+
 			// Run queries
 			if (Options.PRICES_SHOW_TF2WH(TF2OutpostListener.optionsStore))
-				newDetails += f(TF2OutpostListener.INTERNAL_addItemTF2WH, TF2OutpostListener.wh_favicon, item, attrs);
+				newDetails += f(TF2OutpostListener.INTERNAL_addItemTF2WH, TF2OutpostListener.wh_favicon, item, attrs, name, craftable);
 			if (Options.PRICES_SHOW_TRADETF(TF2OutpostListener.optionsStore))
-				newDetails += f(TF2OutpostListener.INTERNAL_addItemTradeTF, TF2OutpostListener.tradetf_favicon, item, attrs);
+				newDetails += f(TF2OutpostListener.INTERNAL_addItemTradeTF, TF2OutpostListener.tradetf_favicon, item, attrs, name, craftable);
 			if (Options.PRICES_SHOW_BPTF(TF2OutpostListener.optionsStore))
-				newDetails += f(TF2OutpostListener.INTERNAL_addItemBPTF, TF2OutpostListener.bptf_favicon, item, attrs);
+				newDetails += f(TF2OutpostListener.INTERNAL_addItemBPTF, TF2OutpostListener.bptf_favicon, item, attrs, name, craftable);
 
 			// Append details
 			if (newDetails)

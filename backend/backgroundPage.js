@@ -59,7 +59,7 @@ chrome.runtime.onInstalled.addListener(function() {
 		chrome.declarativeContent.onPageChanged.addRules([{
 			conditions: [
 				new chrome.declarativeContent.PageStateMatcher({
-				pageUrl: { urlMatches: 'http(s|)://.\.tf2(outpost|wh)\.com|bazaar\.tf' },
+				pageUrl: { urlMatches: '\.(tf2outpost\.com)|(bazaar\.tf)' },
 			})],
 			actions: [ 
 				new chrome.declarativeContent.ShowPageAction()

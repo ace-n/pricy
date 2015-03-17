@@ -78,42 +78,18 @@ var BazaarTFListener = {
 		BazaarTFListener.optionsStore = new kvStore("pricyOptions", listen, false);
 	},
 
-	// TF2WH item adding helper function
-	INTERNAL_addItemTF2WH: function (item, attrs) {
-		
-		// Get data
-		var name = attrs["data-name"].value;
-		var customNamed = Misc.startsWith(name, "&quot;");
-		var craftable = true;
-		if (customNamed)
-			name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-		var notes = attrs["data-notes"];
-		if (notes)
-			craftable = (notes.value.indexOf("(Not Craftable)") === -1);
-
-		// Query TF2WH (and throw an exception if query fails)
+	// TF2WH item adding helper function (will throw an exception if query fails?)
+	INTERNAL_addItemTF2WH: function (item, attrs, name, craftable, notes, customNamed) {
 		var json = PricyQuery.queryTF2WH(BazaarTFListener.itemsStore, name, craftable);
-		
-		// Common add-item logic
 		return commonAddItemTF2WH(BazaarTFListener.optionsStore, json, BazaarTFListener.wh_favicon, customNamed);
 	},
 
 	// Trade.tf item adding helper function
-	INTERNAL_addItemTradeTF: function (item, attrs) {
-		
-		// Get initial data
-		var name = attrs["data-name"].value;
-		var customNamed = name.indexOf("&quot;") == 0;
-		var craftable = true;
-		if (customNamed)
-			name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-		
-		// Get more data + additional parts (strange addons/paints)
-		var notes = attrs["data-notes"];
+	INTERNAL_addItemTradeTF: function (item, attrs, name, craftable, notes, customNamed) {
+			
+		// Get additional parts (strange addons/paints)
 		var parts = [];
 		if (notes) {
-			craftable = (notes.value.indexOf("(Not Craftable)") === -1);
-
 			var noteLines = (notes.value.slice(1, -1)).split(/<.+?>/g);
 			var i, line, pName;
 			var dp = new DOMParser();
@@ -160,25 +136,8 @@ var BazaarTFListener = {
 	},
 
 	// Backpack.tf item adding helper function
-	INTERNAL_addItemBPTF: function (item, attrs) {
-		
-		// Get initial data
-		var name = attrs["data-name"].value;
-		var customNamed = name.indexOf("&quot;") == 0;
-		var craftable = true;
-		if (customNamed)
-			name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
-		
-		// Get more data + additional parts (strange addons/paints)
-		var notes = attrs["data-notes"];
-		var parts = [];
-		if (notes)
-			craftable = (notes.value.indexOf("(Not Craftable)") === -1);
-
-		// Query Trade.tf (and throw an exception if query fails)
+	INTERNAL_addItemBPTF: function (item, attrs, name, craftable, notes, customNamed) {
 		var json = PricyQuery.queryBPTF(BazaarTFListener.itemsStore, name, craftable);
-
-		// Common add-item logic
 		return commonAddItemBPTF(BazaarTFListener.itemsStore, BazaarTFListener.optionsStore, json, BazaarTFListener.bptf_favicon, customNamed);
 	},
 
@@ -208,6 +167,14 @@ var BazaarTFListener = {
 			else if (!newDetails)
 				newDetails = "";
 
+			// Get specific item attributes
+			var name = attrs["data-name"].value;
+			var customNamed = Misc.startsWith(name, "&quot;");
+			if (customNamed)
+				name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
+			var notes = attrs["data-notes"];
+			var craftable = notes ? (notes.value.indexOf("(Uncraftable)") === -1) : true;
+
 			// Generic query handler
 			var f = function(m, favicon, item, attrs) {
 				try {
@@ -221,11 +188,11 @@ var BazaarTFListener = {
 
 			// Run queries
 			if (Options.PRICES_SHOW_TF2WH(BazaarTFListener.optionsStore))
-				newDetails += f(BazaarTFListener.INTERNAL_addItemTF2WH, BazaarTFListener.wh_favicon, item, attrs);
+				newDetails += f(BazaarTFListener.INTERNAL_addItemTF2WH, BazaarTFListener.wh_favicon, item, attrs, name, craftable, notes, customNamed);
 			if (Options.PRICES_SHOW_TRADETF(BazaarTFListener.optionsStore))
-				newDetails += f(BazaarTFListener.INTERNAL_addItemTradeTF, BazaarTFListener.tradetf_favicon, item, attrs);
+				newDetails += f(BazaarTFListener.INTERNAL_addItemTradeTF, BazaarTFListener.tradetf_favicon, item, attrs, name, craftable, notes, customNamed);
 			if (Options.PRICES_SHOW_BPTF(BazaarTFListener.optionsStore))
-				newDetails += f(BazaarTFListener.INTERNAL_addItemBPTF, BazaarTFListener.bptf_favicon, item, attrs);
+				newDetails += f(BazaarTFListener.INTERNAL_addItemBPTF, BazaarTFListener.bptf_favicon, item, attrs, name, craftable, notes, customNamed);
 
 			// Append details
 			if (newDetails)

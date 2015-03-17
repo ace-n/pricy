@@ -65,7 +65,7 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 				case 0:
 					stock = json["h"] + "/" + json["m"];
 				default:
-					stock = fa("inbox") + htmlSpan("pricy-price", tabWrap(stock));
+					stock = fa("inbox") + htmlSpan("pricy-price", "&nbsp;" + stock + tab);
 			}
 
 			// Add details to HTML
