@@ -176,9 +176,9 @@ var BazaarTFListener = {
 			var craftable = notes ? (notes.value.indexOf("(Uncraftable)") === -1) : true;
 
 			// Generic query handler
-			var f = function(m, favicon, item, attrs) {
+			var f = function(m, favicon, item, attrs, name, craftable, notes, customNamed) {
 				try {
-					return m(item, attrs);
+					return m(item, attrs, name, craftable, notes, customNamed);
 				}
 				catch (ex) {
 					console.log(ex);
