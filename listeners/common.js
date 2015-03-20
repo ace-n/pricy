@@ -56,17 +56,19 @@ var commonAddItemTF2WH = function(optionsStore, json, favicon, customNamed) {
 			}
 
 			// Format stock
-			var stock = "";
+			var stock = null;
 			switch (Options.PRICES_STOCK_DISPLAY_MODE(optionsStore)) {
 				case 2:
-					break; // Every other case should fall through to the default
+					break;
 				case 1:
 					stock = parseInt(100*parseFloat(json["h"],10)/parseFloat(json["m"],10), 10) + "%";
+					break;
 				case 0:
 					stock = json["h"] + "/" + json["m"];
-				default:
-					stock = fa("inbox") + htmlSpan("pricy-price", "&nbsp;" + stock + tab);
+					break;
 			}
+			if (stock)
+				stock = fa("inbox") + htmlSpan("pricy-price", "&nbsp;" + stock + tab);
 
 			// Add details to HTML
 			asi = 
