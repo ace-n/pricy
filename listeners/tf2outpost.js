@@ -119,14 +119,10 @@ var TF2OutpostListener = {
 			return null;
 
 		// Add additional data
-		ael = function(item, attrs, origDetails) {
+		ael = function(item, attrs) {
 
 			// Get data
-			var newDetails = attrs['data-subtitle'].value;
-			if (origDetails)
-				newDetails = origDetails;
-			else if (!newDetails)
-				newDetails = "";
+			var newDetails = "";
 
 			// Generic query handler
 			var f = function(m, favicon, item, attrs, name, craftable) {
@@ -157,7 +153,7 @@ var TF2OutpostListener = {
 			if (newDetails)
 				item.setAttribute("data-subtitle", "<div class='pricy-container'>" + newDetails + "</div>");
 		};
-		ael(item, attrs, attrs['data-subtitle'].value);
+		ael(item, attrs);
 	}
 }
 

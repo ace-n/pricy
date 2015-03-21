@@ -158,14 +158,10 @@ var BazaarTFListener = {
 			return null;
 
 		// Add additional data
-		ael = function(item, attrs, origDetails) {
+		ael = function(item, attrs) {
 
 			// Get data
-			var newDetails = attrs['data-details'].value;
-			if (origDetails)
-				newDetails = origDetails;
-			else if (!newDetails)
-				newDetails = "";
+			var newDetails = "";
 
 			// Get specific item attributes
 			var name = attrs["data-name"].value;
@@ -196,9 +192,9 @@ var BazaarTFListener = {
 
 			// Append details
 			if (newDetails)
-				item.setAttribute("data-details", newDetails);
+				item.setAttribute("data-details", "<div class='pricy-container'>" + newDetails + "</div>");
 		};
-		ael(item, attrs, attrs['data-details'].value);
+		ael(item, attrs);
 	}
 }
 
