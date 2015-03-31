@@ -25,11 +25,6 @@
     {
       "matches": ["http://bazaar.tf/*"],
       "js": ["listeners/bazaartf.js"]
-    },
-
-    {
-      "matches": ["http://*.tf2wh.com/*"],
-      "js": ["listeners/tf2wh.js"]
     }
   ],
 

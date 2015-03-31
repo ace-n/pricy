@@ -1,13 +1,13 @@
-// DEBUG
-var clog = function(s) {
-	chrome.extension.getBackgroundPage().console.log(s)
+var saveChanges = function() {
+	$(".notif").show();
+	store.kvSave();
 }
 
 var callback = function () {
 
-	/* Remove no-JS notifier */
-	var noJS = document.getElementById("noJS");
-	noJS.style.display = 'none';
+	/* Hide no-JS and change notifiers */
+	$("#noJS").hide();
+	$(".notif").hide();
 
 	/* Checkbox initializers */
 	$(".checkbox").each(function () {
@@ -41,7 +41,7 @@ var callback = function () {
 
 		// Save appropriate property
 		store.kvSet(t.attr("name"), val);
-		store.kvSave();
+		saveChanges();
 	});
 
 	/* Radio-button initializers */
@@ -71,15 +71,20 @@ var callback = function () {
 
 		// Record value
 		store.kvSet(name, t.attr("value"));
-		clog(name);
-		store.kvSave();
+		saveChanges();
 	});
 
 	/* Num-box helper function */
-	var numboxBoundUpdate = function(t, tbx, idx) {
-		tbx.parent().children("span").removeClass("disabled");
-		console.log(idx + "/" + (Options.PERIODS.length - 1))
-		if (idx === Options.PERIODS.length - 1 || idx === parseInt(tbx.attr("minidx"),10)) {
+	var numboxBoundUpdate = function(t, tbx) {
+
+		// Vars
+		var idx = parseInt(tbx.attr("idx"), 10);
+		var minIdx = tbx.attr("minidx");
+		var maxIdx = Options.PERIODS.length - 1;
+		var txt = t.text();
+
+		// Bounds check
+		if ((idx == minIdx && txt == "-") || (idx == maxIdx && txt == "+")) {
 			t.addClass("disabled");
 		}
 	};
@@ -95,13 +100,16 @@ var callback = function () {
 			idx = t.attr("minidx");
 		t.attr("value", Options.PERIOD_LABELS[idx]);
 		t.attr("idx", idx);
-
-		// Update bound indicators
-		numboxBoundUpdate(t, tbx, idx);
 	});
 	$(".numbox-btn").each(function () {
+
+		// Tooltips
 		var t = $(this);
 		t.attr("title", t.text() === "+" ? "Faster" : "Slower");
+
+		// Bound indicators
+		var tbx = $("#" + t.attr("linkid"));
+		numboxBoundUpdate(t, tbx);
 	});
 
 	/* Num-box listeners */
@@ -122,11 +130,11 @@ var callback = function () {
 		tbx.attr("value", Options.PERIOD_LABELS[idx]);
 
 		// Update bound indicators
-		numboxBoundUpdate(t, tbx, idx);
+		numboxBoundUpdate(t, tbx);
 
 		// Update stored properties
 		store.kvSet(tbx.attr("name"), idx);
-		store.kvSave();
+		saveChanges();
 	});
 
 	/* Disable double click highlighting */

@@ -169,7 +169,7 @@ var BazaarTFListener = {
 			if (customNamed)
 				name = attrs["data-details"].value.replace(new RegExp("^Level \\d+ "), "");
 			var notes = attrs["data-notes"];
-			var craftable = notes ? (notes.value.indexOf("(Uncraftable)") === -1) : true;
+			var craftable = notes ? (notes.value.indexOf("(Not Craftable") === -1) : true;
 
 			// Generic query handler
 			var f = function(m, favicon, item, attrs, name, craftable, notes, customNamed) {
