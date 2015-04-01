@@ -28,6 +28,11 @@
     }
   ],
 
+  "icons": {
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+
   "offline_enabled": false,
 
   "permissions": [
@@ -42,11 +47,12 @@
 
   "page_action": {
     "default_title": "Pricy",
-    "default_icon": "icon copy.png",
+    "default_icon": "icons/pricy-white.png",
     "default_popup": "popup/main.html"
   },
 
   "web_accessible_resources": [
-    "icons/*.ico"
+    "icons/*.ico",
+    "icons/*.png"
   ]
 }
