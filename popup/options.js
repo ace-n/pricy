@@ -86,6 +86,8 @@ var callback = function () {
 		// Bounds check
 		if ((idx == minIdx && txt == "-") || (idx == maxIdx && txt == "+")) {
 			t.addClass("disabled");
+		} else {
+			t.removeClass("disabled");
 		}
 	};
 
@@ -105,7 +107,7 @@ var callback = function () {
 
 		// Tooltips
 		var t = $(this);
-		t.attr("title", t.text() === "+" ? "Faster" : "Slower");
+		t.attr("title", t.text() === "-" ? "Faster" : "Slower");
 
 		// Bound indicators
 		var tbx = $("#" + t.attr("linkid"));
@@ -131,6 +133,7 @@ var callback = function () {
 
 		// Update bound indicators
 		numboxBoundUpdate(t, tbx);
+		numboxBoundUpdate($(t.siblings(".numbox-btn")[0]), tbx);
 
 		// Update stored properties
 		store.kvSet(tbx.attr("name"), idx);
