@@ -22,6 +22,10 @@ a {
 	color: #FF7400;
 }
 
+p {
+	margin: 0px;
+}
+
 .info > ul > li > a {
 	position: relative;
 	left: -3px;
@@ -118,13 +122,12 @@ a {
 }
 
 .symbol-ctr > h4 {
-	margin-top: 5px;
-	margin-bottom: 5px;
+	margin-top: 7px;
+	margin-bottom: 0px;
 }
 
 .symbol {
-	margin-top: 5px;
-	margin-bottom: 5px;
+	margin-bottom: 1px;
 }
 
 /* - Symbol styling */
